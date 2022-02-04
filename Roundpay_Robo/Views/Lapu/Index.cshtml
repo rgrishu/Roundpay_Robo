@@ -28,9 +28,9 @@
                                 <input id="txtSearch" class="form-control text-left" placeholder="Search Lapu" />
                             </div>
                         </div>
-                        <div class="table-responsive">
+                        <div class="table-responsive div-scroll">
                             <table class="table table-bordered table-striped table-responsive-sm" id="tblLapu">
-                                <thead class="bg-tableth">
+                                <thead class="bg-tableth table-fix-head">
                                     <tr>
                                         <th scope="col">#</th>
                                         <th scope="col">Vendor Name</th>
@@ -39,8 +39,8 @@
                                         <th scope="col">Lapu No</th>
                                         <th scope="col">Lapu UserID</th>
                                         <th scope="col">Pin</th>
-                                          <th scope="col">Balance</th>
-                                            <th scope="col">Status</th>
+                                        <th scope="col">Balance</th>
+                                        <th scope="col">Status</th>
                                         <th scope="col">Actions</th>
                                     </tr>
                                 </thead>
@@ -82,7 +82,7 @@
            // preloader.load();
             $.post('/LapuList')
                 .done(function (result) {
-                    $('#__p tbody').html(result);  
+                    $('tbody').html(result);  
                 })
                 .fail(function () {
                     $(this).attr('checked', Is == false);

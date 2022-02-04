@@ -16,7 +16,7 @@
         <div class="scroll-content">
             <div class="container">
                 <div class="form-group">
-                    <label class="lbl" for="txtBankUTR">Enter Vendor</label>
+                    <label class="lbl" for="txtBankUTR" value="@Model.VendorName">Enter Vendor</label>
                     <div class="input-group">
                         <input aria-describedby="AreaHelp" class="form-control" id="txtVendor" placeholder="Enter Vendor Name" tabindex="1" type="text" value="@Model.VendorName">
                     </div>
@@ -68,7 +68,5 @@
             }).always(function () {
                 preloader.remove();
             });
-    });
-
-
+    });    
 </script>

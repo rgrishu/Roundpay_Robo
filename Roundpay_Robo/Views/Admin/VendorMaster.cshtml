@@ -21,21 +21,22 @@
                     <div class="card-header bg-primary text-white h5"> Vendor Master
                         <div class="float-right">  <button id="btnNew" class="btn btn-light btn-sm ">New</button></div>
                     </div>
-                    <div class="card-body" style="">
+                    <div class="card-body">
                         <div class="row mb-1 form-group">
                             <div class="col-md-4 col-sm-4 col-xs-4">
                                 <input id="txtSearch" class="form-control text-left" placeholder="Search Vendor" />
                             </div>
                         </div>
-                        <div class="table-responsive">
+                        <div class="table-responsive div-scroll">
                             <table class="table table-bordered table-striped table-responsive-sm" id="tblVendorMaster">
-                                <thead class="bg-tableth">
+                                <thead class="bg-tableth table-fix-head">
                                     <tr>
                                         <th scope="col">#</th>
                                     @*    <th scope="col">Actions</th>*@
                                         <th scope="col">Vendor Name</th>
                                        @* <th scope="col">Entry Date</th>*@
                                       @*  <th scope="col">Modify Date</th>*@
+                                      <th scope="col">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
@@ -66,7 +67,7 @@
             preloader.load();
             $.post('/VendorList')
                 .done(function (result) {
-                    $('#__p tbody').html(result);  
+                    $('tbody').html(result);
                     
                     //$('tr div.dropdown-menu a.dropdown-item').click(function () {
                     //    var id = 0;
@@ -128,8 +129,7 @@
           //  preloader.load();
             $.post('/VendorAdd')
                 .done(function (result) {
-                    console.log(result);
-                   // resultReload(result);
+                    console.log(result);                   
                     mdlA.id = 'mymodel1';
                     mdlA.content = result;
                     mdlA.options.backdrop = 'static';

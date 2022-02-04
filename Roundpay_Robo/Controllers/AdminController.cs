@@ -26,7 +26,7 @@ namespace Roundpay_Robo.Controllers
             _dapper = dapper;
             _session = _accessor.HttpContext.Session;
             _lr = _session.GetObjectFromJson<LoginResponse>(SessionKeys.LoginResponse);
-         
+
             loginML = new LoginML(_accessor, _env);
         }
         public IActionResult Index()
@@ -110,9 +110,9 @@ namespace Roundpay_Robo.Controllers
         }
         [HttpPost]
         [Route("SaveVendor")]
-        public async  Task<IActionResult> SaveVendorDetail(VendorMaster vendormaster)
+        public async Task<IActionResult> SaveVendorDetail(VendorMaster vendormaster)
         {
-            ILapuML _lml = new LapuML(_accessor,_env,_dapper);
+            ILapuML _lml = new LapuML(_accessor, _env, _dapper);
             return Json(_lml.SaveVendor(vendormaster, _lr));
         }
 
@@ -120,10 +120,24 @@ namespace Roundpay_Robo.Controllers
         [Route("VendorList")]
         public IActionResult GetVendorList()
         {
-                ILapuML _lml = new LapuML(_accessor, _env, _dapper);
-                var res = _lml.GetVendorList(_lr).Result;
-                return PartialView("PartialView/_VendorMasterList", res);
+            ILapuML _lml = new LapuML(_accessor, _env, _dapper);
+            var res = _lml.GetVendorList(_lr).Result;
+            return PartialView("PartialView/_VendorMasterList", res);
         }
-
+        [HttpPost]
+        [Route("DeleteLapuVendor/{ID}")]
+        public IActionResult DeleteLapuVendor(int ID)
+        {
+            ILapuML _lml = new LapuML(_accessor, _env, _dapper);
+            return Json(_lml.DeleteLapuVendor(ID, _lr).Result);
+        }
+        [HttpPost]
+        [Route("SelectEditVendor/{ID}")]
+        public IActionResult SelectEditVendor(int ID)
+        {
+            ILapuML _lml = new LapuML(_accessor, _env, _dapper);
+            var res = _lml.SelectEditVendor(ID, _lr).Result;
+            return PartialView("PartialView/_VendorMaster", res);
+        }
     }
 }

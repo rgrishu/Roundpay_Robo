@@ -3743,7 +3743,6 @@ label {
     }
 
         .login-38 .bg-img img {
-            width: 100%;
             border-radius: 20px;
         }
 
@@ -4132,4 +4131,20 @@ label {
 
     .switch + .switch {
         margin-left: 1rem;
+    }
+
+.div-scroll {
+    overflow-y: scroll;
+    height: 335px;
+}
+
+.table-fix-head {
+    position: sticky;
+    top: 0;
+    background: #fff;
+}
+
+    .table-fix-head tr th {
+        border-bottom: 2px solid #dee2e6;
+        border-top: 2px solid #dee2e6;
     }
