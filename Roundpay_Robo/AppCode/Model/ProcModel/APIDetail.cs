@@ -30,18 +30,18 @@ namespace Roundpay_Robo.AppCode.Model.ProcModel
         public string PANID { get; set; }
         public string ValidationStatusKey { get; set; }
         public string ValidationStatusValue { get; set; }
-        public string APIOutletIDMob { get; set; }        
-        public string GeoCodeAGT { get; set; }        
-        public string GeoCodeMOB { get; set; }        
-        public string GeoCodeINT { get; set; }        
-        public string HookTIDKey { get; set; }        
-        public string HookStatusKey { get; set; }        
-        public int HookResTypeID { get; set; }        
-        public string HookVendorKey { get; set; }        
-        public string HookLiveIDKey { get; set; }        
-        public string HookMsgKey { get; set; }        
-        public string HookBalanceKey { get; set; }        
-        public string HookSuccessCode { get; set; }        
+        public string APIOutletIDMob { get; set; }
+        public string GeoCodeAGT { get; set; }
+        public string GeoCodeMOB { get; set; }
+        public string GeoCodeINT { get; set; }
+        public string HookTIDKey { get; set; }
+        public string HookStatusKey { get; set; }
+        public int HookResTypeID { get; set; }
+        public string HookVendorKey { get; set; }
+        public string HookLiveIDKey { get; set; }
+        public string HookMsgKey { get; set; }
+        public string HookBalanceKey { get; set; }
+        public string HookSuccessCode { get; set; }
         public string HookFailCode { get; set; }
         public string BillFetchAPICode { get; set; }
         public string FirstDelimiter { get; set; }
@@ -50,7 +50,7 @@ namespace Roundpay_Robo.AppCode.Model.ProcModel
         public string HookSecondDelimiter { get; set; }
         public string HookErrorCodeKey { get; set; }
     }
-    public class APIDetail : APIGroupDetail
+    public class APIDetail: APIGroupDetail
     {
         public int ID { get; set; }
         public int APIType { get; set; }

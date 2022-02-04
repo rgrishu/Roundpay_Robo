@@ -155,9 +155,40 @@ namespace Roundpay_Robo.AppCode
             return _resp;
         }
 
-      
 
+        public bool IsCustomerCareAuthorised(string OperationCode)
+        {
+            var loginResp = chkAlternateSession();
+            if (loginResp != null)
+            {
+                if (LoginType.CustomerCare == loginResp.LoginTypeID)
+                {
+                    var OperationsAssigned = loginResp.operationsAssigned ?? new List<OperationAssigned>();
+                    if (OperationsAssigned.Any())
+                    {
+                        if (OperationsAssigned.Any(x => x.OperationCode == OperationCode && x.IsActive))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
 
+        private LoginResponse chkAlternateSession()
+        {
+            var result = new LoginResponse();
+            if (_lr != null)
+            {
+                result = _lr;
+            }
+            if (_lrEmp != null)
+            {
+                result = _lrEmp;
+            }
+            return result;
+        }
     }
 }
 

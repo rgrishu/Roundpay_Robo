@@ -14,7 +14,7 @@ namespace Roundpay_Robo.AppCode.Interfaces
 
   
         ResponseStatus CallSignup(UserCreate _req);
-       
-        
+
+        bool IsCustomerCareAuthorised(string OperationCode);
     }
 }

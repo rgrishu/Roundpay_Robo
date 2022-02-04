@@ -148,11 +148,20 @@ namespace Roundpay_Robo.AppCode.Model
         public DateTime CookieExpire { get; set; }
         public int LoginTypeID { get; set; }
         public string LoginType { get; set; }
-        //public IEnumerable<OperationAssigned> operationsAssigned { get; set; }
+        public IEnumerable<OperationAssigned> operationsAssigned { get; set; }
         public string Token { get; set; }
         public bool IsGoogle2FAEnable { get; set; }
         public string AccountSecretKey { get; set; }
         public bool IsDeviceAuthenticated { get; set; }
+    }
+    public class OperationAssigned
+    {
+        public int MenuID { get; set; }
+        public string Menu { get; set; }
+        public int OperationID { get; set; }
+        public string Operation { get; set; }
+        public string OperationCode { get; set; }
+        public bool IsActive { get; set; }
     }
     public class UserRequset : LoginReq
     {

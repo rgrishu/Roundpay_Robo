@@ -37,23 +37,16 @@
             $v.showErrorFor($('#txtVendor'), 'Please Enter Vendor Name', true);
             return false;
         }
+        debugger;
         preloader.load();
         $.post('/SaveVendor', { ID: VID, VendorName: vendor })
             .done(function (result) {
                 resultReload(result);
-                if (result.statuscode === -1) {
-                    an.title = 'Oops';
-                    an.content = message;
-                    an.alert(an.type.failed);
-                    an.autoClose = 2;
-                }
-                else {
-                    an.title = 'Welldone!';
-                    an.content = result.msg;
-                    an.alert(an.type.success);
-                    mdlA.dispose();
-                    loadVendor();
-                }
+                 an.title = result.statusCode == an.type.success ? "Welldone" : "Oops";
+                 an.content = result.msg;
+                 an.alert(result.statusCode);
+                 mdlA.dispose();
+                 loadVendor();
             }).fail(function (xhr) {
                 if (xhr.status == 500) {
                     an.title = 'Oops';

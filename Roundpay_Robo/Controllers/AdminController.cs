@@ -113,7 +113,7 @@ namespace Roundpay_Robo.Controllers
         public async  Task<IActionResult> SaveVendorDetail(VendorMaster vendormaster)
         {
             ILapuML _lml = new LapuML(_accessor,_env,_dapper);
-            return Json(_lml.SaveVendor(vendormaster, _lr));
+            return Json(_lml.SaveVendor(vendormaster, _lr).Result);
         }
 
         [HttpPost]
