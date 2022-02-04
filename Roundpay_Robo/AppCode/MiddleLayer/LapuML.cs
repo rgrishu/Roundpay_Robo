@@ -34,7 +34,6 @@ namespace Roundpay_Robo.AppCode
             _dal = new DAL(_c.GetConnectionString());
             _info = new RequestInfo(_accessor, _env);
         }
-
         public async Task<Response> SaveVendor(VendorMaster vendormaster, LoginResponse _lr)
         {
             var dbparams = new DynamicParameters();
@@ -46,17 +45,19 @@ namespace Roundpay_Robo.AppCode
         public async Task<List<VendorMaster>> GetVendorList(LoginResponse _lr)
         {
             var dbparams = new DynamicParameters();
+            dbparams.Add("UserId", _lr.UserID, DbType.Int32);
+            dbparams.Add("VendorID", 0, DbType.Int32);
             var res = await Task.FromResult(_dapper.GetAll<VendorMaster>("proc_GetLapuVendor", dbparams, commandType: CommandType.StoredProcedure));
             return res;
         }
-
         public async Task<List<Lapu>> GetLapuList(LoginResponse _lr)
         {
             var dbparams = new DynamicParameters();
+            dbparams.Add("UserID", _lr.UserID, DbType.Int32);
+            dbparams.Add("LapuID", 0, DbType.Int32);
             var res = await Task.FromResult(_dapper.GetAll<Lapu>("proc_GetLapuList", dbparams, commandType: CommandType.StoredProcedure));
             return res;
         }
-
         public async Task<Response> LapuLogin(LapuLoginRequest lapulogireq, LoginResponse _lr, int LapuID)
         {
             ILapuApiML apiml = new LapuApiML(_accessor, _env, _dapper);

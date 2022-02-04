@@ -23,11 +23,18 @@ namespace Roundpay_Robo.Controllers
             _dapper = dapper;
             _session = _accessor.HttpContext.Session;
             _lr = _session.GetObjectFromJson<LoginResponse>(SessionKeys.LoginResponse);
-            
+            loginML = new LoginML(_accessor, _env);
         }
         public IActionResult Index()
         {
-            return View();
+            if (loginML.IsInValidSession())
+            {
+                return RedirectToAction("Index", "Login");
+            }
+            if (_lr.RoleID == Role.APIUser && LoginType.ApplicationUser == _lr.LoginTypeID)
+                return View();
+            return Ok();
+            
         }
         [Route("Report")]
         public IActionResult Report()
