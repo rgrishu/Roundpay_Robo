@@ -46,9 +46,7 @@
     function LoadLapuReport(){
     $.get("GetLapuReport").done(function(result){
         $("tbody").html(result);
-        an.title = "Success !"
-        an.content = "Data Loaded";
-        an.alert(an.type.success);
+      
     }).fail(function(xhr){
         an.title = "Wow !"
         an.content = "Error Occured";
