@@ -1,19 +1,19 @@
 ﻿@using Roundpay_Robo.AppCode.Model;
 @model List<VendorMaster>
-
-@{
-    var counter = 1;
-}
-
 @if (Model.Any())
 {
+    int i = 0;
     foreach (var item in Model)
     {
+        i++;
         <tr data-item-id="@item.ID" data-ar="@item.VendorName">
-            <td>@counter</td>
+            <td>@i</td>
             <td>@item.VendorName</td>
+            <td>
+                <a class="btn btn-sm btn-danger text-light" onclick="btnDelete(@item.ID)"><i class="fas fa-trash"></i></a>
+                <a class="btn btn-sm btn-info text-light" onclick="EditVendorBtn(@item.ID)"><i class="fas fa-pen"></i></a>
+            </td>
         </tr>
-        counter = counter + 1;
     }
 }
 else
@@ -24,4 +24,51 @@ else
         </td>
     </tr>
 }
-
+<script>
+    function btnDelete(ID){
+        debugger;
+        preloader.load();
+        $.post(`DeleteLapuVendor/${ID}`).done(function(result){
+            debugger;
+            if(typeof result === 'object'){
+                resultReload(result);
+                if(result.statusCode === 1){
+                    an.title = "Success";
+                    an.content = result.msg;
+                    an.alert(an.type.success)
+                }
+                else if(result.statusCode === -1){
+                    an.title = "Oops";
+                    an.content = result.msg;
+                    an.alert(an.type.warning);
+                }
+            }
+            preloader.remove();
+            loadVendor();
+        }).fail(function(){
+            an.title = "Error";
+            an.content = "Network ror Occured"
+            an.alert(an.type.failed);
+            preloader.remove();
+        });
+    }
+    function EditVendorBtn(ID){
+        debugger;
+        preloader.load();
+        $.post(`SelectEditVendor/${ID}`).done(function(result){
+            debugger;
+            mdlA.id = 'mymodel2';
+            mdlA.content = result;                    
+            mdlA.options.backdrop = 'static';
+            mdlA.alert(mdlA.size.default);
+            $('button.close span,#mdlCancel').unbind().click(function () {
+                mdlA.dispose();
+            });
+            preloader.remove();
+        }).fail(function(xhr){
+            debugger;
+            alert("Failed");
+            preloader.remove();
+        });
+    }
+</script>

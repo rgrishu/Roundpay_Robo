@@ -39,6 +39,7 @@ namespace Roundpay_Robo.AppCode
             var dbparams = new DynamicParameters();
             dbparams.Add("LoginID", _lr.UserID, DbType.String);
             dbparams.Add("Name", vendormaster.VendorName, DbType.String);
+            dbparams.Add("VendorID", vendormaster.ID, DbType.String);
             var res = await Task.FromResult(_dapper.Insert<Response>("proc_SaveVendorMaster", dbparams, commandType: CommandType.StoredProcedure));
             return res;
         }
@@ -239,7 +240,7 @@ namespace Roundpay_Robo.AppCode
                                         item.LapuBalance = Recres.data.balAfterTxn;
                                         Cres = await UpdateTransaction(item);
                                         //Update Transaction
-                                        response.ERRORCODE = ErrorCodes.Transaction_Successful.ToString(); 
+                                        response.ERRORCODE = ErrorCodes.Transaction_Successful.ToString();
                                         response.MSG = Recres.Resp_desc;
                                         return response;
                                     }
@@ -326,6 +327,22 @@ namespace Roundpay_Robo.AppCode
             var res = await Task.FromResult(_dapper.GetAll<LapuReport>("proc_SelectLapuRechargeReport", dbparams, commandType: CommandType.StoredProcedure));
             return res;
         }
-
+        public async Task<Response> DeleteLapuVendor(int ID, LoginResponse _lr)
+        {
+            var dbparams = new DynamicParameters();
+            dbparams.Add("LoginID", _lr.UserID, DbType.String);
+            dbparams.Add("VendorID", ID, DbType.String);
+            var res = await Task.FromResult(_dapper.Insert<Response>("proc_DeletelapuVendor", dbparams, commandType: CommandType.StoredProcedure));
+            return res;
+        }
+        public async Task<VendorMaster> SelectEditVendor(int ID, LoginResponse _lr)
+        {
+            var dbparams = new DynamicParameters();
+            dbparams.Add("LoginID", _lr.UserID, DbType.String);
+            dbparams.Add("VendorID", ID, DbType.String);
+            //var res = await Task.FromResult(_dapper.Insert<Lapu>("proc_GetLapuList", dbparams, commandType: CommandType.StoredProcedure));
+            var res = await Task.FromResult(_dapper.Get<VendorMaster>("Proc_SelectEditVendor", dbparams, commandType: CommandType.StoredProcedure));
+            return res;
+        }
     }
 }
