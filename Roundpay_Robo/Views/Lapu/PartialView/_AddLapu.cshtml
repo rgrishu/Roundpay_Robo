@@ -1,0 +1,97 @@
+﻿@using Roundpay_Robo.Models
+@model Lapu
+<div class="col-md-12">
+    <div class="row">
+        <input type="hidden" value="@Model.LapuID" id="hiddenModalID" />
+        <div class="col-md-12 mb-2" id="LapuVendor">
+            <label class="lbl mb-1" for="LapuVendorList">Vendor</label>
+            <select class="form-control" id="LapuVendorList">
+                @if (Model.VendorID == 1)
+                {
+                    <option value="0">:: Select Vendor ::</option>
+                    <option value="1" selected>Lapu Vendor</option>
+                    <option value="2">New Vendor</option>
+                    <option value="-1">Others</option>
+                }
+                @if (Model.VendorID == 2)
+                {
+                    <option value="0">:: Select Vendor ::</option>
+                    <option value="1">Lapu Vendor</option>
+                    <option value="2" selected>New Vendor</option>
+                    <option value="-1">Others</option>
+                }
+                else
+                {
+                    <option value="0">:: Select Vendor ::</option>
+                    <option value="1">Lapu Vendor</option>
+                    <option value="2">New Vendor</option>
+                    <option value="-1">Others</option>
+                }
+            </select>
+            <input type="text" style="display:none;" class="col-md-12 mt-2 form-control" placeholder="Enter Vendor" id="txtforOthers" />
+        </div>
+        <div class="col-md-12 mb-2" id="LapuProvider">
+            <label class="lbl mb-1" for="LapuProviderList">Provider</label>
+            <select class="form-control" id="LapuProviderList">
+                @if (Model.ProviderID == 1)
+                {
+
+                    <option value="0">:: Select Provider ::</option>
+                    <option value="1" selected>test Provider 1</option>
+                    <option value="2">test Provider 2</option>
+                    <option value="3">test Provider 3</option>
+                }
+                @if (Model.ProviderID == 2)
+                {
+                    <option value="0">:: Select Provider ::</option>
+                    <option value="1">test Provider 1</option>
+                    <option value="2" selected>test Provider 2</option>
+                    <option value="3">test Provider 3</option>
+                }
+                @if (Model.ProviderID == 3)
+                {
+                    <option value="0">:: Select Provider ::</option>
+                    <option value="1">test Provider 1</option>
+                    <option value="2">test Provider 2</option>
+                    <option value="3" selected>test Provider 3</option>
+                }
+                else
+                {
+                    <option value="0">:: Select Provider ::</option>
+                    <option value="1">test Provider 1</option>
+                    <option value="2">test Provider 2</option>
+                    <option value="3">test Provider 3</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-12">
+            <label class="lbl mb-1" for="LapuNickName">Lapu NickName</label>
+            <input type="text" class="form-control" placeholder="Enter Lapu NickName" id="LapuNickName" value="@Model.LapuNickName" />
+        </div>
+        <div class="col-md-12">
+            <label class="lbl mb-1" for="LapuMobileno">Lapu Mobile No.</label>
+            <input type="text" class="form-control" placeholder=" Enter Lapu Number" id="LapuMobileno" value="@Model.LapuNo" />
+        </div>
+        <div class="col-md-12">
+            <label class="lbl mb-1" for="LapuUserId">Lapu UserId</label>
+            <input type="text" class="form-control" placeholder="Enter UserId" id="LapuUserId" value="@Model.LapuUserID" />
+        </div>
+        <div class="col-md-12">
+            <label class="lbl mb-1" for="LapuPassword">Password</label>
+            <input type="password" class="form-control" placeholder="Lapu Password" id="LapuPassword" value="@Model.Password" />
+        </div>
+        <div class="col-md-12">
+            <label class="lbl mb-1" for="LapuPin">PIN</label>
+            <input type="text" class="form-control" placeholder="Lapu PIN" id="LapuPin" value="@Model.Pin" />
+        </div>
+        <div class="col-md-12 mt-3">
+            <div class="float-right">
+                <button type="button" class="btn btn-dark" id="btnSave" tabindex="7">Save</button>
+                <button class="btn btn-danger" id="mdlCancel">Cancel</button>
+            </div>
+        </div>
+        <div class="form-group form-box">
+            <small id="errorMsg" class="text-danger hide"></small>
+        </div>
+    </div>
+</div>

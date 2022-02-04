@@ -1,0 +1,59 @@
+﻿<div class="wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xl-12">
+                <div class="card">
+                    <div class="card-header bg-primary text-light">
+                        <div class="header-title">
+                            <i class="mdi mdi-book-open-page-variant"></i> Lapu Recharge Report
+                            </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped table-responsive-sm" id="tblLapu">
+                                <thead class="bg-tableth">
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col" class="text-nowrap">Transaction ID</th>
+                                        <th scope="col" class="text-nowrap">Account No</th>
+                                        <th scope="col" class="text-nowrap">Outlet Name</th>
+                                        <th scope="col" class="text-nowrap">Provider</th>
+                                        <th scope="col" class="text-nowrap">Entry Date</th>
+                                        <th scope="col" class="text-nowrap">Modify Date</th>
+                                        <th scope="col" class="text-nowrap">Lapu Opening</th>
+                                        <th scope="col" class="text-nowrap">Recharge Amount</th>
+                                        <th scope="col" class="text-nowrap">Lapu Closing</th>
+                                        <th scope="col" class="text-nowrap">Lapu No</th>
+                                        <th scope="col" class="text-nowrap">Live ID</th>
+                                        <th scope="col">Status</th>
+                                        @*<th scope="col">Action</th>*@
+                                    </tr>
+                                </thead>
+                                <tbody style="height: 310px;"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+<script>
+    $(document).ready(function(){
+        LoadLapuReport();
+    });
+    function LoadLapuReport(){
+    $.get("GetLapuReport").done(function(result){
+        $("tbody").html(result);
+        an.title = "Success !"
+        an.content = "Data Loaded";
+        an.alert(an.type.success);
+    }).fail(function(xhr){
+        an.title = "Wow !"
+        an.content = "Error Occured";
+        an.alert(an.type.failed);
+    });
+    }
+</script>
+}

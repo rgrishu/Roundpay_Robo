@@ -1,0 +1,132 @@
+﻿@using Roundpay_Robo.AppCode.Model;
+@model List<Lapu>
+@{
+    var counter = 1;
+}
+
+@if (Model.Any())
+{
+    foreach (var item in Model)
+    {
+        <tr data-item-id="@item.LapuID" data-ar="@item.VendorName">
+            <td>@counter</td>
+            <td>@item.VendorName</td>
+            <td>@item.ProviderName</td>
+            <td>@item.LapuNickName</td>
+            <td>@item.LapuNo</td>
+            <td>@item.LapuUserID</td>
+            <td>@item.Pin</td>
+            <td>@item.LapuBalance</td>
+             <td>
+                <span class="switch switch-sm">
+                    <input type="checkbox" data-toggle="toggle" onchange="ActiveInavtive(@item.LapuID, this)" class="switch switch-sm" id="isact_@counter" 
+                    @Html.Raw(item.LapuStatus ? "checked='checked'" : "")>
+                    <label for="isact_@counter"></label>
+                </span>
+            </td>
+            <td>
+                <a  id="@counter" class="btn btn-primary btn-sm text-light" onclick="lapulogin(@counter)" data-id="@item.LapuID" data-pd="@item.Password" 
+                data-ptid="@item.ProviderTokenID" data-ar="@item.LapuNo">Login</a> |
+                <a  class="btn btn-sm btn-success text-light" onclick="lapubalance(@counter)" data-id="@item.LapuID" data-pd="@item.Password" 
+                data-ptid="@item.ProviderTokenID" data-ar="@item.LapuNo">Balance</a>
+                   <a class="btn btn-sm btn-danger text-light" onclick="btnDelete(@item.LapuID)"><i class="fas fa-trash"></i></a>
+            </td>
+        </tr>
+        counter = counter + 1;
+    }
+}
+else
+{
+    <tr rowspan="2">
+        <td colspan="9">
+            <center>No Record Found</center>
+        </td>
+    </tr>
+}
+
+
+
+<script>
+    var lapulogin =  (counter)=> {
+          var lapuid=$('#'+counter).attr("data-id");
+          var lapupswd=$('#'+counter).attr("data-pd");
+          var lapuno=$('#'+counter).attr("data-ar");
+          preloader.load();
+         $.post('/LapuLogin', { mobile: lapuno, password: lapupswd,lapuid:lapuid})
+             .done(function (result) {
+                  if (typeof result === 'object') {
+                        resultReload(result);
+                       if (result.statusCode === -1) {
+                     an.title = 'Oops';
+                     an.content = result.msg;
+                     an.alert(an.type.failed);
+                     an.autoClose = 2;
+                 }
+                 else {
+                     an.title = 'Welldone!';
+                     an.content = result.msg;
+                     an.alert(an.type.success);
+                     loadLapu();
+                 }
+                 }
+                 else{
+                      mdlA.id = 'mymodel1';
+                    mdlA.content = result;
+                    mdlA.options.backdrop = 'static';
+                    mdlA.alert(mdlA.size.default);
+                    $('button.close span,#mdlCancel').unbind().click(function () {
+                        mdlA.dispose();
+                    });
+                 }
+             }).fail(function (xhr) {
+                 if (xhr.status == 500) {
+                     an.title = 'Oops';
+                     an.content = 'Server error';
+                     an.alert(an.type.failed);
+                 }
+                 if (xhr.status == 0) {
+                     an.title = 'Oops';
+                     an.content = 'Internet Connection was broken';
+                     an.alert(an.type.failed);
+                 }
+             }).always(function () {
+                 preloader.remove();
+             });
+         }
+           var lapubalance =  (counter)=> {
+          var lapuid=$('#'+counter).attr("data-id");
+          var lapupswd=$('#'+counter).attr("data-pd");
+          var lapuno=$('#'+counter).attr("data-ar");
+           var ptid=$('#'+counter).attr("data-ptid");
+          preloader.load();
+         $.post('/LapuBalance', { mobile: lapuno, password: lapupswd,access_token:ptid,lapuid:lapuid })
+             .done(function (result) {
+                 resultReload(result);
+                 if (result.statusCode === -1) {
+                     an.title = 'Oops';
+                     an.content =  result.msg;;
+                     an.alert(an.type.failed);
+                     an.autoClose = 2;
+                 }
+                 else {
+                     an.title = 'Welldone!';
+                     an.content = result.msg;
+                     an.alert(an.type.success);
+                     loadLapu();
+                 }
+             }).fail(function (xhr) {
+                 if (xhr.status == 500) {
+                     an.title = 'Oops';
+                     an.content = 'Server error';
+                     an.alert(an.type.failed);
+                 }
+                 if (xhr.status == 0) {
+                     an.title = 'Oops';
+                     an.content = 'Internet Connection was broken';
+                     an.alert(an.type.failed);
+                 }
+             }).always(function () {
+                 preloader.remove();
+             });
+         }
+</script>

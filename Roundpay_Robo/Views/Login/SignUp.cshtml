@@ -1,0 +1,282 @@
+﻿@using Roundpay_Robo.AppCode.Model
+@model LoginPageModel
+@{
+    ViewData["Title"] = "Registration";
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+}
+@*
+    <div class="page_loader"></div>*@
+
+<!-- Login 38 start -->
+<div class="login-38">
+    <div class="container">
+        <div class="col-md-12">
+            <div class="row login-box-6">
+               
+                <div class="col-lg-4 col-sm-12 col-pad-0 align-self-center">
+                    <div class="login-inner-form">
+                        <div class="details">
+                            <div class="logo-2 clearfix">
+                                <a href="login.html">
+                                    <img src="assets/images/logo-2.png" alt="logo">
+                                </a>
+                            </div>
+                            <h3>Create An Cccount</h3>
+                            <div class="form-group form-box">
+                                @Html.TextBox("txtName", null, new { @placeholder = "Name ", @class = "form-control input_user" })
+                            </div>
+
+                            <div class="form-group form-box">
+                                @Html.TextBox("txtOname", null, new { @placeholder = "Outlet Name", @class = "form-control" })
+                            </div>
+                            @*<div class="form-group form-box">
+
+                                <select id="ddlRole" aria-describedby="roleHelp" tabindex="2" class="form-control">
+
+                                    @if (Model.referralRoleMaster.Roles != null)
+                                    {
+                                        if (Model.referralRoleMaster.Roles.Count() != 1)
+                                        {
+                                            <option selected value="0">:: Choose Role ::</option>
+                                            @foreach (var _roles in Model.referralRoleMaster.Roles)
+                                            {
+                                                <option value="@_roles.ID">@_roles.Role</option>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            @foreach (var _roles in Model.referralRoleMaster.Roles)
+                                            {
+                                                <option value="@_roles.ID">@_roles.Role</option>
+                                            }
+                                        }
+
+                                    }
+                                </select>
+                            </div>*@
+
+                            <div class="form-group form-box">
+                                @Html.TextBox("txtMobileNo", null, new { @placeholder = "Mobile No", @class = "form-control" })
+                            </div>
+                            <div class="form-group form-box">
+                                @Html.TextBox("txtEmail", null, new { @placeholder = "Email", @class = "form-control" })
+                            </div>
+
+                            <div class="form-group form-box">
+                                @Html.TextBox("txtAddress", null, new { @placeholder = "Address", @class = "form-control" })
+                            </div>
+                            <div class="form-group form-box">
+                                @Html.TextBox("txtPinCode", null, new { @placeholder = "Pin Code", @class = "form-control" })
+                            </div>
+                            <div class="form-group form-box">
+                                <small id="errorMsg" class="text-danger hide"></small>
+                            </div>
+                            <div class="form-group">
+                                <button id="btnSignUp" type="button" value="LOGIN"  class="btn-md btn-theme w-100">Sign Up</button>
+                            </div>
+                            <p>Already have an Account ?<a href="/Login" class="text-primary">Click Here</a></p>
+                        </div>
+                    </div>
+                </div>
+
+                 <div class="col-lg-8 col-md-12 col-sm-12 col-pad-0 bg-img align-self-center none-992">
+                   
+                    <img src="~/Theme/images/logo.png" />
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    @if (Model.ThemeID == 4)
+    {
+<script type="text/javascript">
+    $('.rploginSlide').each(function () {
+        var $this = $(this);
+        var $group = $this.find('.slide_group');
+        var $slides = $this.find('.slide');
+        var bulletArray = [];
+        var currentIndex = 0;
+        var timeout;
+
+        function move(newIndex) {
+            var animateLeft, slideLeft;
+
+            advance();
+
+            if ($group.is(':animated') || currentIndex === newIndex) {
+                return;
+            }
+
+            bulletArray[currentIndex].removeClass('active');
+            bulletArray[newIndex].addClass('active');
+
+            if (newIndex > currentIndex) {
+                slideLeft = '100%';
+                animateLeft = '-100%';
+            } else {
+                slideLeft = '-100%';
+                animateLeft = '100%';
+            }
+
+            $slides.eq(newIndex).css({
+                display: 'block',
+                left: slideLeft
+            });
+            $group.animate({
+                left: animateLeft
+            }, function () {
+                $slides.eq(currentIndex).css({
+                    display: 'none'
+                });
+                $slides.eq(newIndex).css({
+                    left: 0
+                });
+                $group.css({
+                    left: 0
+                });
+                currentIndex = newIndex;
+            });
+        }
+
+        function advance() {
+            clearTimeout(timeout);
+            timeout = setTimeout(function () {
+                if (currentIndex < ($slides.length - 1)) {
+                    move(currentIndex + 1);
+                } else {
+                    move(0);
+                }
+            }, 4000);
+        }
+
+        $('.next_btn').on('click', function () {
+            if (currentIndex < ($slides.length - 1)) {
+                move(currentIndex + 1);
+            } else {
+                move(0);
+            }
+        });
+
+        $('.previous_btn').on('click', function () {
+            if (currentIndex !== 0) {
+                move(currentIndex - 1);
+            } else {
+                move(3);
+            }
+        });
+
+        $.each($slides, function (index) {
+            var $button = $('<a class="slide_btn">•</a>');
+
+            if (index === currentIndex) {
+                $button.addClass('active');
+            }
+            $button.on('click', function () {
+                move(index);
+            }).appendTo('.slide_buttons');
+            bulletArray.push($button);
+        });
+
+        advance();
+    });</script>
+    }
+
+<script src="~/js/validator.js" asp-append-version="true"></script>
+<script src="~/js/login.js" asp-append-version="true"></script>
+
+<script>
+    $(document).ready(function () {
+
+        $('#btnSignUp').click(function () {
+
+            SignUp();
+        });
+    });
+    function SignUp() {
+        var $v = $validator;
+        errorMsg.removeClass('hide');
+        var Name = $('#txtName'), OutletName = $('#txtOname'), MobileNo = $('#txtMobileNo'), Email = $('#txtEmail'),
+            Address = $('#txtAddress'), PinCode = $('#txtPinCode'), ReferralID = $('#hdnReferralID');
+        var UserName = Name.val(),
+            OutletName = OutletName.val(),
+            DdlRole = 2,
+            MobileNo = MobileNo.val(),
+            Email = Email.val(),
+            Address = Address.val(),
+            PinCode = PinCode.val(),
+            ReferralID = ReferralID.val();
+        var ct = {
+            nam: $('#txtName'), Oname: $('#txtOname'), mob: $('#txtMobileNo'), eml: $('#txtEmail'), btn: $('#btnSignUp'), pnc: $('#txtPinCode'), Add: $('#txtAddress')
+        };
+        var IsE = {
+            nam: ($v.$IsNum(ct.nam.val()) || ct.nam.val().trim() == '' || ct.nam.val().length > 100),
+            Onam: ($v.$IsNum(ct.Oname.val()) || ct.Oname.val().trim() == '' || ct.Oname.val().length > 100),            
+            mob: (ct.mob.val().length !== 10 || !$v.$IsMob(ct.mob.val())),
+            eml: (!$v.$IsEmail(ct.eml.val()) || ct.eml.val().length > 256),
+            pnc: (!$v.$IsPincode(ct.pnc.val())),
+
+        }
+        $v.showErrorFor(ct.nam, 'Name is non-numeric mandatory field and length is not more than 100', IsE.nam);
+        $v.showErrorFor(ct.Oname, 'Name is non-numeric mandatory field and length is not more than 100', IsE.Onam);
+        $v.showErrorFor(ct.rle, 'Role is required, select role from list! (<i>In case of list is empty add role first</i>)', IsE.rle);
+        $v.showErrorFor(ct.mob, 'Mobile number is mandatory field and length should be 10', IsE.mob);
+        $v.showErrorFor(ct.eml, 'Enter correct Email Id is mandatory field', IsE.eml);
+        $v.showErrorFor(ct.pnc, 'Enter correct Pincode is mandatory field and length should be 6', IsE.pnc);
+        IsE.err = (IsE.nam || IsE.Onam || IsE.mob || IsE.eml || IsE.pnc);
+        if (IsE.err) {
+            return false;
+        }
+
+        var UserCreate = {};
+        UserCreate.Name = UserName;
+        UserCreate.OutletName = OutletName;
+        UserCreate.RoleID = DdlRole;
+        UserCreate.MobileNo = MobileNo;
+        UserCreate.EmailID = Email;
+        UserCreate.Address = Address;
+        UserCreate.Pincode = PinCode;
+        UserCreate.ReferalID = ReferralID;
+
+        an.id = "myalert";
+        an.autoClose = 5;
+        preloader.load();
+        $.ajax({
+            type: 'POST',
+            url: '/Signup',
+            dataType: 'json',
+            contentType: 'application/json',
+            data: JSON.stringify(UserCreate),
+            success: function (result) {
+                console.log(result);
+                if (result.statuscode == an.type.failed) {
+                    an.title = "Oops";
+                    an.content = result.msg;
+                    an.alert(result.statuscode);
+                }
+                else if (result.statuscode == an.type.success) {
+                    an.title = "Well done";
+                    an.content = result.msg;
+                    an.alert(result.statuscode);
+                    mdlA.dispose();
+                }
+            }, statusCode: {
+                500: function () {
+                    Alerts('Oops! Server error', AlertStatus.RED);
+                },
+                0: function () {
+                    Alerts('Oops! Internet Connection was broken', AlertStatus.RED);
+                }
+            },
+            error: function (xhr, result) {
+                Alerts(result, AlertStatus.RED);
+            },
+            complete: function () {
+                preloader.remove();
+            }
+        });
+    };
+</script>
+}

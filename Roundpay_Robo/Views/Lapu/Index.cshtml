@@ -1,0 +1,269 @@
+﻿@{
+    ViewData["Title"] = "Lapu";
+}
+<div aria-label="breadcrumb" class="breadcrumb" id="page-header">
+    <div class="container-fluid">
+        <h5 class="float-left"><i class="fas fa-map-marker-alt"></i> @ViewData["Title"]</h5>
+        <ol class="breadcrumb float-right">
+            <li class="breadcrumb-item"><a href="javascript:void(0)">Home</a></li>
+            <li class="breadcrumb-item">Vendor</li>
+            <li class="breadcrumb-item active">@ViewData["Title"]</li>
+        </ol>
+    </div>
+</div>
+<div id="__p" class="main-temp-body">
+    <div class="container-fluid">
+        <div class="row">
+            <input type="hidden" id="hdnIP"/>
+            <input type="hidden" id="hdnIPType"/>
+            <div class="col-md-12">
+                <div class="card mt-4">
+                    <div class="card-header bg-primary text-white">
+                        <i class="fas fa-map-marker-alt"></i> @ViewData["Title"]
+                        <div class="float-right">  <button id="btnNew" class="btn btn-default btn-sm ">New</button></div>
+                    </div>
+                    <div class="card-body" style="">
+                        <div class="row mb-1 form-group">
+                            <div class="col-md-4 col-sm-4 col-xs-4">
+                                <input id="txtSearch" class="form-control text-left" placeholder="Search Lapu" />
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped table-responsive-sm" id="tblLapu">
+                                <thead class="bg-tableth">
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Vendor Name</th>
+                                        <th scope="col">Provider Name</th>
+                                        <th scope="col">Lapu Nick Name</th>
+                                        <th scope="col">Lapu No</th>
+                                        <th scope="col">Lapu UserID</th>
+                                        <th scope="col">Pin</th>
+                                          <th scope="col">Balance</th>
+                                            <th scope="col">Status</th>
+                                        <th scope="col">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            an.close();
+            setTimeout(function () {
+                $('#txtSearch').focus();
+                $("#txtSearch").on("keyup", function () {
+                    var value = $(this).val().toLowerCase();
+                    $('#tblLapu tbody tr').filter(function () {
+                        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                    });
+                });
+            }, 500);
+            loadLapu();
+            $("body").on("change", "#LapuVendorList", function(){
+            var Selectedvalue = $(this).val();
+            if(Selectedvalue == 3){
+                $("#txtforOthers").show();
+            }
+            else{
+                $("#txtforOthers").hide();
+            }
+        })
+        });
+        var loadLapu =  ()=> {
+           // preloader.load();
+            $.post('/LapuList')
+                .done(function (result) {
+                    $('#__p tbody').html(result);  
+                })
+                .fail(function () {
+                    $(this).attr('checked', Is == false);
+                    if (xhr.status == 500) {
+                        an.title = 'Oops';
+                        an.content = 'Server error';
+                        an.alert(an.type.failed);
+                    }
+                    if (xhr.status == 0) {
+                        an.title = 'Oops';
+                        an.content = 'Internet Connection was broken';
+                        an.alert(an.type.failed);
+                    }
+                })
+                .always(function () {
+                    preloader.remove();
+                });
+        }
+
+
+        $('#btnNew').on('click', () => {
+            debugger;
+          //  preloader.load();
+            $.post('/LapuAdd')
+                .done(function (result) {
+                    console.log(result);
+                    //resultReload(result);
+                    mdlA.id = 'mymodel1';
+                    mdlA.content = result;
+                    mdlA.options.backdrop = 'static';
+                    mdlA.alert(mdlA.size.default);
+                    $('button.close span,#mdlCancel').unbind().click(function () {
+                        mdlA.dispose();
+                    });
+                }).fail(function (xhr) {
+                    if (xhr.status == 500) {
+                        an.title = 'Oops';
+                        an.content = 'Server error';
+                        an.alert(an.type.failed);
+                    }
+                    if (xhr.status == 0) {
+                        an.title = 'Oops';
+                        an.content = 'Internet Connection was broken';
+                        an.alert(an.type.failed);
+                    }
+                }).always(function () {
+                    preloader.remove();
+                });
+        });
+         $('#btnNew').on('click', () => {
+        debugger;
+      //  preloader.load();
+        $.post('/LapuAdd')
+            .done(function (result) {
+                console.log(result);
+               // resultReload(result);
+                mdlA.id = 'mymodel1';
+                mdlA.content = result;
+                mdlA.options.backdrop = 'static';
+                mdlA.alert(mdlA.size.default);
+                $('button.close span,#mdlCancel').unbind().click(function () {
+                    mdlA.dispose();
+                });
+            }).fail(function (xhr) {
+                if (xhr.status == 500) {
+                    an.title = 'Oops';
+                    an.content = 'Server error';
+                    an.alert(an.type.failed);
+                }
+                if (xhr.status == 0) {
+                    an.title = 'Oops';
+                    an.content = 'Internet Connection was broken';
+                    an.alert(an.type.failed);
+                }
+            }).always(function () {
+                preloader.remove();
+            });
+    });
+    $("body").on("click", "#btnSave" ,function(){
+        debugger;
+        var $v = $validator;
+        var LapuUserDetail = {
+            LapuID: $("#hiddenModalID").val(),
+            VendorID: $("#LapuVendorList").val(),
+            ProviderID: $("#LapuProviderList").val(),
+            LapuNickName: $("#LapuNickName").val(),
+            LapuNo: $("#LapuMobileno").val(),
+            LapuUserID: $("#LapuUserId").val(),
+            Password: $("#LapuPassword").val(),
+            Pin: $("#LapuPin").val(),
+            OtherVendorName: $("#txtforOthers").val()
+        }
+        var ct={
+            vendorid:$("#LapuVendorList"),
+            providerid:$("#LapuProviderList"),
+            lapunickname:$("#LapuNickName"),
+            lapuno:$("#LapuMobileno"),
+            lapuUserid:$("#LapuUserId"),
+            password:$("#LapuPassword"),
+            pin:$("#LapuPin")
+        }
+        var IsE = {
+            vendorid:(ct.vendorid.val() == 0),
+            providerid:(ct.providerid.val() == 0),
+            lapunickname:($v.$IsNum(ct.lapunickname.val()) || ct.lapunickname.val().trim() == '' || ct.lapunickname.val() > 100),
+            lapuno:(ct.lapuno.val().length !=10 || $v.$IsMob(ct.lapuno.val())),
+            lapuUserid:(ct.lapuUserid.val() == ''),
+            password:(ct.password.val() == ''),
+            pin:($v.$IsMob(ct.pin.val()) || ct.pin.val() == '')
+        }
+        $v.showErrorFor(ct.vendorid,"Vendor Should be selected", IsE.vendorid);
+        $v.showErrorFor(ct.providerid,"Provider Should be selected", IsE.providerid);
+        $v.showErrorFor(ct.lapunickname,"Lapu Nickname is Mandatory is should be less than 100", IsE.lapunickname);
+        $v.showErrorFor(ct.lapuno,"Enter valid lapuNo", IsE.lapuno);
+        $v.showErrorFor(ct.lapuUserid,"Enter Lapu UserId", IsE.lapuUserid);
+        $v.showErrorFor(ct.password,"Password is Mandatory", IsE.password);
+        $v.showErrorFor(ct.pin,"Pin is Mandatory", IsE.pin);
+        IsE.err = (IsE.vendorid || IsE.providerid || IsE.lapunickname || IsE.lapuno || IsE.lapuUserid || IsE.password || IsE.pin);
+        if (IsE.err) {
+            return false;
+        }
+        $.post("SaveLapuBtn", LapuUserDetail).done(function(){
+            mdlA.dispose();
+            loadLapu();
+            an.title="Success !";
+            an.content="Lapu Data Saved";
+            an.alert(an.type.success);
+        }).fail(function(xhr){
+            an.title="Oops !";
+            an.content="Error Occured";
+            an.alert(an.type.success);
+        });
+    });
+    function btnDelete(LapuID){
+        debugger;
+        $.post(`DeleteLapuDetail/${LapuID}`).done(function(){
+            an.title = "Success !";
+            an.content = "Lapu Data Deleted";
+            an.alert(an.type.success);
+            preloader.remove();
+            loadLapu();
+            }).fail(function(){
+            an.title = "Oops !";
+            an.content = "Error Occured";
+            an.alert(an.type.failed);
+            preloader.remove();
+            });
+    }
+    function btnEditLapu(LapuID){
+        debugger;
+        $.get(`GetEditLapuDetail/${LapuID}`).done(function(result){
+            console.log(result);
+            mdlA.id = 'mymodel1';
+            mdlA.content = result;
+            mdlA.options.backdrop = 'static';
+            mdlA.alert(mdlA.size.default);
+            $('button.close span,#mdlCancel').unbind().click(function () {
+                mdlA.dispose();
+            });
+        }).fail(function(xhr){
+            an.title = "Oops !";
+            an.content = "Error Occured";
+            an.alert(an.type.failed);
+        });
+    }
+    function ActiveInavtive(LapuID, a) {
+        preloader.load();
+        var Is = $(a).is(':checked');
+        $.post(`/UpdateLapuStatus/${LapuID}`, {}, function (result) {
+            preloader.remove();
+            an.title = result.statuscode == -1 ? 'Oops' : Is ? 'Activated' : 'Inactivated';
+            if (result.statuscode == an.type.success)
+                result.statuscode = Is ? an.type.success : an.type.info;
+            an.content = result.msg;
+            an.alert(result.statuscode);
+            loadLapu();
+        }).fail(xhr => {
+            an.title = 'Oops';
+            an.content = xhr.status === 0 ? 'Internet Connection was broken' : 'Server error';
+            an.alert(an.type.failed);
+        }).always(() => preloader.remove());
+    }
+    </script>
+}

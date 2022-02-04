@@ -1,0 +1,51 @@
+﻿<!DOCTYPE html>
+
+<html>
+    @{
+    string WID = "W" + Convert.ToString(ViewData["WID"]);
+    string ThemeID = "t" + Convert.ToString(ViewData["Theme"]);
+}
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewData["Title"] - @ViewData["HTitle"]</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <!-- External CSS libraries -->
+    <link type="text/css" rel="stylesheet" href="~/Theme/css/bootstrap.min.css">
+    <link type="text/css" rel="stylesheet" href="~/Theme/fonts/font-awesome/css/font-awesome.min.css">
+    <link type="text/css" rel="stylesheet" href="~/Theme/fonts/flaticon/font/flaticon.css">
+
+    <!-- Favicon icon -->
+    <link rel="shortcut icon" href="~/Theme/img/favicon.ico" type="image/x-icon">
+
+    <!-- Google fonts -->
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800%7CPoppins:400,500,700,800,900%7CRoboto:100,300,400,400i,500,700">
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+
+    <!-- Custom Stylesheet -->
+     <link type="text/css" rel="stylesheet" href="~/css/table-loader.css">
+    <link type="text/css" rel="stylesheet" href="~/Theme/css/style.css">
+</head>
+<body>
+    <div class="body" @*style="background-image:url(@ViewData["Host"]/Image/Website/@ViewData["WID"]/@ThemeID/bg-main.png);background-size:cover;height:100%;"*@>
+        <noscript><center><h1 class="text-danger">Javascript is disabled in your browser enable to start application</h1></center></noscript>
+       <div id="alertmsg"></div>
+        @RenderBody()
+          <environment include="Development">
+            <script src="~/lib/jquery/dist/jquery.js"></script>
+            <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+            <script src="~/js/require.js"></script>
+        </environment>
+        <environment exclude="Development">
+            <script src="~/lib/jquery/dist/jquery.min.js"></script>
+            <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+            <script src="~/js/require.js"></script>
+        </environment>
+        <script>
+        var $$host = '@(ViewData["Host"])';
+        </script>
+        @RenderSection("Scripts", required: false)
+    </div>
+</body>
+
+</html>

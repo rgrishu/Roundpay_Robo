@@ -1,0 +1,51 @@
+﻿@using Microsoft.AspNetCore.Http
+@using Roundpay_Robo.AppCode.Configuration;
+@using Roundpay_Robo.AppCode.StaticModel;
+@using Roundpay_Robo.AppCode.Model;
+@using Roundpay_Robo.AppCode;
+@using Roundpay_Robo.AppCode;
+@using Microsoft.AspNetCore.Hosting;
+@using Newtonsoft.Json;
+@using Roundpay_Robo.AppCode.HelperClass;
+@inject IHttpContextAccessor HttpContextAccessor
+@inject IHostingEnvironment _env
+@{
+    LoginResponse _lr = HttpContextAccessor.HttpContext.Session.GetObjectFromJson<LoginResponse>(SessionKeys.LoginResponse);
+
+    LoginResponse _lrEmp = HttpContextAccessor.HttpContext.Session.GetObjectFromJson<LoginResponse>(SessionKeys.LoginResponseEmp);
+
+    LoginML loginML = new LoginML(HttpContextAccessor, _env);
+    var WebInfo = loginML.GetWebsiteInfo();
+    UserML userML = new UserML(HttpContextAccessor, _env);
+    var Cprofile = userML.GetCompanyProfileApp(WebInfo.WID);
+    if (_lr != null)
+    {
+        if (_lr.LoginTypeID == LoginType.ApplicationUser)
+        {
+            ViewData["IsMarkedGreen"] = _lr.IsMarkedGreen;
+            ViewData["IsPaymentGateway"] = _lr.IsPaymentGateway;
+            if (_lr.RoleID < 1)
+            {
+                Layout = "_LoginLayout";
+            }
+            else if (_lr.RoleID == Role.Admin)
+            {
+                Layout = "_Layout";
+            }
+            
+            else if (_lr.RoleID == Role.APIUser)
+            {
+                Layout = "_Layout_ApiUser";
+            }
+            
+            else
+            {
+                Layout = "_Layout";
+            }
+        }
+        else
+        {
+            Layout = "_LoginLayout";
+        }
+    }
+}
