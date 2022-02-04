@@ -2263,7 +2263,7 @@ table.focus-on tbody tr.focused td {
 }
 
 body {
-    padding-bottom: 65px
+   /* padding-bottom: 65px*/
 }
 
 .wrapper {
@@ -3703,7 +3703,7 @@ label {
     }
 
     .login-38 .login-box-6 {
-        margin: 0 100px 0 0;
+        /*margin: 0 100px 0 0;*/
         border-radius: 5px;
         box-shadow: 0 0 35px rgba(0, 0, 0, 0.1);
         background: #fff;
@@ -3725,22 +3725,27 @@ label {
     }
 
     .login-38 .login-inner-form .details {
-        padding: 100px 0 100px 100px;
+        padding: 40px 0 40px 40px;
     }
 
     .login-38 .bg-img {
         background-size: cover;
-        position: absolute;
+        /*position: absolute;*/
         border-radius: 5px;
         padding: 50px;
         z-index: 999;
         margin: 30px 0;
-        right: -100px;
-        background: rgba(0, 0, 0, 0.04) url(../images/img-2.jpg) top left repeat;
+        /*right: -100px;*/
+        /*background: rgba(0, 0, 0, 0.04) url(../images/img-2.jpg) top left repeat;*/
         background-size: cover;
         justify-content: center;
         align-items: center;
     }
+
+        .login-38 .bg-img img {
+            width: 100%;
+            border-radius: 20px;
+        }
 
     .login-38 .form-box {
         float: left;
@@ -3779,7 +3784,7 @@ label {
     }
 
     .login-38 .login-inner-form .form-group {
-        margin-bottom: 25px;
+        margin-bottom: 15px;
     }
 
     .login-38 .login-inner-form .form-control {
@@ -3787,7 +3792,7 @@ label {
         width: 100%;
         padding: 10px 20px;
         font-size: 16px;
-        height: 50px;
+        height: 40px;
         outline: 0;
         font-weight: 500;
         color: #717171;
@@ -3798,9 +3803,9 @@ label {
 
     .login-38 .login-inner-form .btn-md {
         cursor: pointer;
-        height: 50px;
+        height: 40px;
         color: #fff;
-        padding: 13px 50px 12px 50px;
+        padding: 0px 50px 0px 50px;
         font-size: 15px;
         font-weight: 400;
         font-family: 'Jost', sans-serif;
