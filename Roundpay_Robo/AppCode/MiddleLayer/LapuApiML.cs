@@ -58,7 +58,7 @@ namespace Roundpay_Robo.AppCode
             }
             return setting;
         }
-        public async Task<Response> LapuApiLogin(LapuLoginRequest lapuloginreq, LoginResponse _lr, int LapuID,bool FromBalance=false)
+        public async Task<Response> LapuApiLogin(LapuLoginRequest lapuloginreq,int UserID, int LapuID,bool FromBalance=false)
         {
             var response = new Response()
             {
@@ -66,17 +66,15 @@ namespace Roundpay_Robo.AppCode
                 Msg = ErrorCodes.FAILED
                
             };
-           
             try
             {
-
                 LapuLoginResponse res = new LapuLoginResponse();
                 lapuloginreq.token = appSetting.Token;
                 string URL = appSetting.URL + "Action/login";
                 var resp = await AppWebRequest.O.PostJsonDataUsingHWRAsync(URL, lapuloginreq).ConfigureAwait(false);
                 var LapuApiReqResForDB = new LapuApiReqResForDB()
                 {
-                    UserID = _lr.UserID,
+                    UserID = UserID,
                     LapuID = LapuID,
                     URL = URL,
                     Request = Newtonsoft.Json.JsonConvert.SerializeObject(lapuloginreq),
@@ -110,7 +108,7 @@ namespace Roundpay_Robo.AppCode
                             if (res.data.code == "0")
                             {
                                 var dbparams = new DynamicParameters();
-                                dbparams.Add("UserID", _lr.UserID, DbType.Int32);
+                                dbparams.Add("UserID", UserID, DbType.Int32);
                                 dbparams.Add("LapuID", LapuID, DbType.Int32);
                                 dbparams.Add("Balance", res.data.currentBal, DbType.Decimal);
                                 dbparams.Add("ProviderTokenID", res.data.token, DbType.String);
@@ -118,6 +116,7 @@ namespace Roundpay_Robo.AppCode
                                 if (!FromBalance) {
                                     response.Msg = response.StatusCode == 1 ? "Login Successfull" : response.Msg;
                                 }
+                                response.CommonStr = res.data.token;
                             }
                         }
                         else if (res.Resp_code == LapuResCode.ERR)
@@ -144,7 +143,7 @@ namespace Roundpay_Robo.AppCode
             };
             if (string.IsNullOrEmpty(lapuloginreq.access_token))
             {
-                response = await LapuApiLogin(lapuloginreq, _lr, LapuID,true);
+                response = await LapuApiLogin(lapuloginreq, _lr.UserID, LapuID,true);
                 return response;
             }
 
@@ -166,7 +165,7 @@ namespace Roundpay_Robo.AppCode
                 var lappuerror = JsonConvert.DeserializeObject<LapuError>(profres);
                 if (lappuerror.Resp_code == LapuResCode.ERR)
                 {
-                    response = await LapuApiLogin(lapuloginreq, _lr, LapuID, true);
+                    response = await LapuApiLogin(lapuloginreq, _lr.UserID, LapuID, true);
                     return response;
                 }
                 else
@@ -188,14 +187,14 @@ namespace Roundpay_Robo.AppCode
                             //For Session Expire Code Is 1
                             if (profileres.data.code == "1")
                             {
-                                response = await LapuApiLogin(lapuloginreq, _lr, LapuID, true);
+                                response = await LapuApiLogin(lapuloginreq, _lr.UserID, LapuID, true);
                                 return response;
                             }
                         }
                     }
                     else
                     {
-                        response = await LapuApiLogin(lapuloginreq, _lr, LapuID, true);
+                        response = await LapuApiLogin(lapuloginreq, _lr.UserID, LapuID, true);
                         return response;
                     }
                 }
@@ -270,11 +269,12 @@ namespace Roundpay_Robo.AppCode
 
 
 
-        public async Task<LapuLoginResponse> InitiateTransaction(InitiateTransaction initiatetransaction, int UserID, int LapuID)
+        public async Task<string> InitiateTransaction(InitiateTransaction initiatetransaction, int UserID, int LapuID)
         {
             LapuLoginResponse response = new LapuLoginResponse();
             initiatetransaction.token = appSetting.Token;
 
+           // string ULRRec = appSetting.URL + "Action/test";
             string ULRRec = appSetting.URL + "Action/init_txn";
             var recres = await AppWebRequest.O.PostJsonDataUsingHWRAsync(ULRRec, initiatetransaction).ConfigureAwait(false);
             var LapuApiReqResForDB2 = new LapuApiReqResForDB()
@@ -288,22 +288,22 @@ namespace Roundpay_Robo.AppCode
                 Method = "Post"
             };
             SaveLapuReqRes(LapuApiReqResForDB2);
-            if (!string.IsNullOrEmpty(recres))
-            {
-                var lappuerror = JsonConvert.DeserializeObject<LapuError>(recres);
-                if (lappuerror.Resp_code == LapuResCode.ERR)
-                {
-                    response.Resp_code = lappuerror.Resp_code;
-                    response.Resp_desc = lappuerror.Resp_desc;
-                    return response;
-                }
-                else
-                {
-                    var otpobjres = JsonConvert.DeserializeObject<LapuLoginResponse>(recres);
-                    response = otpobjres;
-                }
-            }
-            return response;
+            //if (!string.IsNullOrEmpty(recres))
+            //{
+            //    var lappuerror = JsonConvert.DeserializeObject<LapuError>(recres);
+            //    if (lappuerror.Resp_code == LapuResCode.ERR)
+            //    {
+            //        response.Resp_code = lappuerror.Resp_code;
+            //        response.Resp_desc = lappuerror.Resp_desc;
+            //        return response;
+            //    }
+            //    else
+            //    {
+            //        var otpobjres = JsonConvert.DeserializeObject<LapuLoginResponse>(recres);
+            //        response = otpobjres;
+            //    }
+            //}
+            return recres;
         }
 
 

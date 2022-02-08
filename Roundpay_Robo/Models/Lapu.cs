@@ -127,8 +127,13 @@
         public string TransactionID { get; set; }
  
         public string ErrorCode { get; set; }
+        public string Message { get; set; }
         public decimal Balance { get; set; }
         public string LiveID { get; set; }
+        public string Account { get; set; }
+        public string LapuRechargeNumber { get; set; }
+        public bool IsExistAPIRequestID { get; set; }
+        public decimal BalanceAmount { get; set; }
     }
     public class InitiateTransaction
     {

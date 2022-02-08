@@ -54,6 +54,7 @@ namespace Roundpay_Robo.AppCode.Model.ProcModel
     {
         public int ID { get; set; }
         public int APIType { get; set; }
+        public string DataKey { get; set; }
         public string _APIType { get; set; }
         public string OnlineOutletID { get; set; }
         public string Name { get; set; }

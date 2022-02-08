@@ -40,8 +40,8 @@ namespace Roundpay_Robo.AppCode.HelperClass
             _env = env;
         }
         #region TransactionRelated
-   
-        public async Task<TransactionStatus> MatchResponse(int OID, RechargeAPIHit rechargeAPIHit, string AccountNoKey, bool IsValidation = false)
+
+        public async Task<TransactionStatus> MatchResponse(int OID, RechargeAPIHit rechargeAPIHit, string AccountNoKey)
         {
             const string MethodName = "MatchResponse";
             var tstatus = new TransactionStatus
@@ -62,26 +62,13 @@ namespace Roundpay_Robo.AppCode.HelperClass
             {
                 var IsOtherCondition = false;
                 var OtherConditionMatchString = string.Empty;
+                tstatus.IsResend = false;
+                tstatus.IsReLoginLapu = false;
                 var errorCodes = new ErrorCodeDetail();
                 var ds = new DataSet();
                 if (rechargeAPIHit.aPIDetail.ResponseTypeID == ResponseType.JSON)
                 {
                     ds = _toDataSet.ReadDataFromJson(rechargeAPIHit.Response);
-                }
-                else if (rechargeAPIHit.aPIDetail.ResponseTypeID == ResponseType.XML)
-                {
-                    ds = _toDataSet.ReadDataFromXML(rechargeAPIHit.Response);
-                }
-                else if (rechargeAPIHit.aPIDetail.ResponseTypeID == ResponseType.Delimiter)
-                {
-                    IsOtherCondition = true;
-                    if (!string.IsNullOrEmpty(rechargeAPIHit.aPIDetail.FirstDelimiter))
-                    {
-                        if (rechargeAPIHit.Response.Contains(rechargeAPIHit.aPIDetail.FirstDelimiter) && !string.IsNullOrEmpty(rechargeAPIHit.aPIDetail.SecondDelimiter))
-                        {
-                            IsOtherCondition = rechargeAPIHit.Response.Contains(rechargeAPIHit.aPIDetail.SecondDelimiter) == false;
-                        }
-                    }
                 }
                 else
                 {
@@ -95,43 +82,39 @@ namespace Roundpay_Robo.AppCode.HelperClass
                 var IsMessageFound = false;
                 if (ds.Tables.Count > 0 && !IsOtherCondition)
                 {
-                    bool IsStatusFound = string.IsNullOrEmpty(rechargeAPIHit.aPIDetail.StatusName), IsVendorIDFound = string.IsNullOrEmpty(rechargeAPIHit.aPIDetail.VendorID), IsOperatorIDFound = string.IsNullOrEmpty(rechargeAPIHit.aPIDetail.LiveID), IsRefKeyFound = string.IsNullOrEmpty(rechargeAPIHit.aPIDetail.RefferenceKey);
+                    bool IsStatusFound = string.IsNullOrEmpty(rechargeAPIHit.aPIDetail.StatusName),
+
+                        IsVendorIDFound = string.IsNullOrEmpty(rechargeAPIHit.aPIDetail.VendorID),
+                        IsOperatorIDFound = string.IsNullOrEmpty(rechargeAPIHit.aPIDetail.LiveID),
+                        IsRefKeyFound = string.IsNullOrEmpty(rechargeAPIHit.aPIDetail.RefferenceKey),
+                        IsBalanceKeyFound = string.IsNullOrEmpty(rechargeAPIHit.aPIDetail.BalanceKey);
+                   
                     foreach (DataTable tbl in ds.Tables)
                     {
+
                         if (!IsStatusFound)
                         {
-                            if (IsValidation)
+                            var STn = CheckIfKeyExistsInDatatable(tbl, rechargeAPIHit.aPIDetail.StatusName);
+                            if (STn.CommonBool)
                             {
-                                var VSK = CheckIfKeyExistsInDatatable(tbl, rechargeAPIHit.aPIDetail.ValidationStatusKey);
+                                IsStatusFound = true;
+                                string StatusValue = tbl.Rows[0][STn.CommonStr].ToString().ToUpper();
+                                if (!string.IsNullOrEmpty(rechargeAPIHit.aPIDetail.SuccessCode))
+                                {
+                                        //if (tstatus.Status == LapuFailCode.SessionExpired)
+                                        //{
+                                        //    tstatus.IsResend = true;
 
-                                if (VSK.CommonBool)
-                                {
-                                    IsStatusFound = true;
-                                    string StatusValue = tbl.Rows[0][VSK.CommonStr].ToString().ToUpper();
-                                    if (!string.IsNullOrEmpty(rechargeAPIHit.aPIDetail.ValidationStatusValue))
+                                        //    return tstatus;
+                                        //}
+                                    var sucValArr = rechargeAPIHit.aPIDetail.SuccessCode.ToUpper().Split(',');
+                                    tstatus.Status = sucValArr.Contains(StatusValue) ? RechargeRespType.SUCCESS : tstatus.Status;
+                                    if (tstatus.Status == RechargeRespType.PENDING && !string.IsNullOrEmpty(rechargeAPIHit.aPIDetail.FailCode))
                                     {
-                                        var sucValArr = rechargeAPIHit.aPIDetail.ValidationStatusValue.ToUpper().Split(',');
-                                        tstatus.Status = sucValArr.Contains(StatusValue) ? RechargeRespType.SUCCESS : tstatus.Status;
+                                        var failValArr = rechargeAPIHit.aPIDetail.FailCode.ToUpper().Split(',');
+                                        tstatus.Status = failValArr.Contains(StatusValue) ? RechargeRespType.FAILED : tstatus.Status;
                                     }
-                                }
-                            }
-                            else
-                            {
-                                var STn = CheckIfKeyExistsInDatatable(tbl, rechargeAPIHit.aPIDetail.StatusName);
-                                if (STn.CommonBool)
-                                {
-                                    IsStatusFound = true;
-                                    string StatusValue = tbl.Rows[0][STn.CommonStr].ToString().ToUpper();
-                                    if (!string.IsNullOrEmpty(rechargeAPIHit.aPIDetail.SuccessCode))
-                                    {
-                                        var sucValArr = rechargeAPIHit.aPIDetail.SuccessCode.ToUpper().Split(',');
-                                        tstatus.Status = sucValArr.Contains(StatusValue) ? RechargeRespType.SUCCESS : tstatus.Status;
-                                        if (tstatus.Status == RechargeRespType.PENDING && !string.IsNullOrEmpty(rechargeAPIHit.aPIDetail.FailCode))
-                                        {
-                                            var failValArr = rechargeAPIHit.aPIDetail.FailCode.ToUpper().Split(',');
-                                            tstatus.Status = failValArr.Contains(StatusValue) ? RechargeRespType.FAILED : tstatus.Status;
-                                        }
-                                    }
+                                    
                                 }
                             }
                         }
@@ -160,6 +143,14 @@ namespace Roundpay_Robo.AppCode.HelperClass
                             {
                                 IsErrorCodeFound = true;
                                 tstatus.APIErrorCode = tbl.Rows[0][ECD.CommonStr].ToString();
+
+                                if (tstatus.APIErrorCode == LapuFailCode.SessionExpired)
+                                {
+                                    tstatus.Status = RechargeRespType.PENDING;
+                                    tstatus.IsResend = true;
+                                    tstatus.IsReLoginLapu = true;
+                                    return tstatus;
+                                }
                             }
                         }
                         if (!IsMessageFound && tstatus.Status != RechargeRespType.SUCCESS)
@@ -177,11 +168,20 @@ namespace Roundpay_Robo.AppCode.HelperClass
                             IsRefKeyFound = true;
                             tstatus.RefferenceID = tbl.Rows[0][RFK.CommonStr].ToString();
                         }
+                        if (!IsBalanceKeyFound && tstatus.Status == RechargeRespType.SUCCESS)
+                        {
+                            var BCK = CheckIfKeyExistsInDatatable(tbl, rechargeAPIHit.aPIDetail.BalanceKey);
+                            if (BCK.CommonBool)
+                            {
+                                IsBalanceKeyFound = true;
+                                tstatus.Balance = tbl.Rows[0][BCK.CommonStr].ToString();
+                            }
+                        }
                         if (IsStatusFound && IsVendorIDFound && IsOperatorIDFound && IsErrorCodeFound && IsMessageFound && IsRefKeyFound)
                             break;
                     }
                 }
-              
+
 
                 if (tstatus.Status.In(RechargeRespType.PENDING, RechargeRespType.FAILED) && (ds.Tables.Count > 0 || rechargeAPIHit.aPIDetail.ResponseTypeID == ResponseType.Delimiter) && !IsOtherCondition)
                 {

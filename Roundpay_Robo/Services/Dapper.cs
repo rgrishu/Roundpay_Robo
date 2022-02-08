@@ -109,5 +109,37 @@ namespace Roundpay_Robo.Services
 
             return result;
         }
+
+
+
+        public async Task<dynamic> GetMultiple<T1, T2>(string sp, DynamicParameters parms, CommandType commandType = CommandType.StoredProcedure)
+        {
+            using IDbConnection db = new SqlConnection(_config.GetConnectionString(Connectionstring));
+            try
+            {
+                if (db.State == ConnectionState.Closed)
+                    db.Open();
+                var result = await db.QueryMultipleAsync(sp, parms, commandType: commandType).ConfigureAwait(false);
+               
+                    var res = new
+                    {
+                        Table1 = result.Read<T1>(),
+                        Table2 = !result.IsConsumed ? result.Read<T2>():null
+                    };
+                return res;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (db.State == ConnectionState.Open)
+                    db.Close();
+            }
+        }
+
+
+
     }
 }

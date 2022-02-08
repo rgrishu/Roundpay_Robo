@@ -32,7 +32,9 @@ namespace RoundpayFinTech.AppCode.Model.ProcModel
         public string RefferenceID { get; set; }
         public string ErrorCode { get; set; }
         public string ErrorMsg { get; set; }
+        public string Balance { get; set; }
         public bool IsResend { get; set; }
+        public bool IsReLoginLapu { get; set; }
         public int SwitchingID { get; set; }
     }
     public class RechargeAPIHit

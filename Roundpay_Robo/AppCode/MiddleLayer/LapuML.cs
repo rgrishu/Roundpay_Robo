@@ -2,12 +2,14 @@
 using Roundpay_Robo.AppCode.Configuration;
 using Roundpay_Robo.AppCode.DB;
 using Roundpay_Robo.AppCode.DL;
+using Roundpay_Robo.AppCode.HelperClass;
 using Roundpay_Robo.AppCode.Interfaces;
 using Roundpay_Robo.AppCode.Model;
 using Roundpay_Robo.AppCode.Model.ProcModel;
 using Roundpay_Robo.AppCode.StaticModel;
 using Roundpay_Robo.Models;
 using Roundpay_Robo.Services;
+using RoundpayFinTech.AppCode.Model.ProcModel;
 using System.Data;
 using Validators;
 
@@ -62,7 +64,7 @@ namespace Roundpay_Robo.AppCode
         public async Task<Response> LapuLogin(LapuLoginRequest lapulogireq, LoginResponse _lr, int LapuID)
         {
             ILapuApiML apiml = new LapuApiML(_accessor, _env, _dapper);
-            var res = await apiml.LapuApiLogin(lapulogireq, _lr, LapuID);
+            var res = await apiml.LapuApiLogin(lapulogireq, _lr.UserID, LapuID);
             return res;
         }
         public async Task<Response> LapuBalance(LapuLoginRequest lapulogireq, LoginResponse _lr, int LapuID)
@@ -101,12 +103,13 @@ namespace Roundpay_Robo.AppCode
             };
             var response = new LapuRechargeResponse()
             {
+
                 ACCOUNT = _req.Account,
                 Amount = _req.Amount,
                 AGENTID = _req.APIRequestID,
                 OPID = _req.SPKey,
-                STATUS = RechargeRespType.FAILED,
-                MSG = ErrorCodes.FAILED,
+                STATUS = RechargeRespType.PENDING,
+                MSG = ErrorCodes.Request_Accpeted.ToString(),
             };
             #region RequestValidationFromCode  
             /**
@@ -188,10 +191,35 @@ namespace Roundpay_Robo.AppCode
                 dbparams.Add("Account", _req.Account, DbType.String);
                 dbparams.Add("Amount", _req.Amount, DbType.String);
                 dbparams.Add("APIRequestID", _req.APIRequestID, DbType.String);
-                var res = await Task.FromResult(_dapper.GetAll<LapuTransaction>("proc_LapuRechargeTransaction", dbparams, commandType: CommandType.StoredProcedure));
+                // var res = await Task.FromResult(_dapper.GetMultiple<LapuTransaction>("proc_LapuRechargeTransaction", dbparams, commandType: CommandType.StoredProcedure));
+                var result = _dapper.GetMultiple<LapuTransaction, APIDetail>("[proc_LapuRechargeTransaction]", dbparams, commandType: CommandType.StoredProcedure).Result;
+                var res = (List<LapuTransaction>)result.GetType().GetProperty("Table1").GetValue(result, null);
+                var apiresdetails = (List<APIDetail>)result.GetType().GetProperty("Table2").GetValue(result, null);
+
                 if (res != null)
                     if (res.FirstOrDefault().StatusCode == ErrorCodes.One)
                     {
+                        // ApiRequestID Exists Then Return The Detail Of Exists APIRequestID  Form Transaction Detail
+                        if (res.FirstOrDefault().IsExistAPIRequestID == true)
+                        {
+                            response.ACCOUNT = res.FirstOrDefault().Account;
+                            response.Amount = res.FirstOrDefault().BalanceAmount;
+                            response.RPID = res.FirstOrDefault().TransactionID;
+                            response.AGENTID = _req.APIRequestID;
+                            response.OPID = res.FirstOrDefault().LiveID;
+                            response.STATUS = res.FirstOrDefault().Type;
+                            response.MSG = res.FirstOrDefault().Msg;
+                            response.LapuBAL = res.FirstOrDefault().BalanceAmount;
+                            response.ERRORCODE = res.FirstOrDefault().ErrorCode;
+                            response.LapuNumber = res.FirstOrDefault().LapuRechargeNumber;
+                            return response;
+                        }
+                        if (apiresdetails == null)
+                        {
+                            response.ERRORCODE = ErrorCodes.Transaction_Failed_Replace.ToString();
+                            response.MSG = ErrorCodes.FAILED;
+                            return response;
+                        }
                         foreach (var item in res)
                         {
                             response.RPID = item.TransactionID;
@@ -209,9 +237,58 @@ namespace Roundpay_Robo.AppCode
                                 @long = "77.2749852"
                             };
 
-                            var Recres = apiml.InitiateTransaction(req, item.UserID, item.LapuID).Result;
-                            //ForTesting Purpose Only Start Here
+                            RechargeAPIHit rechargeAPIHit = new RechargeAPIHit();
+                            rechargeAPIHit.aPIDetail = apiresdetails.FirstOrDefault();
+                            rechargeAPIHit.ServiceID = Convert.ToInt32(validateReq.SPKey);
+                            rechargeAPIHit.LoginID = validateReq.LoginID;
+                            rechargeAPIHit.IsException = false;
 
+                            var tstatus = doTransaction(req, item.UserID, item.LapuID);
+
+                            TransactionStatus doTransaction(InitiateTransaction req, int UserID, int LapuID)
+                            {
+                                TransactionStatus tstatus = new TransactionStatus();
+
+                                //intiate  api transaction For Recharge
+
+                                string res = apiml.InitiateTransaction(req, UserID, LapuID).Result;
+                                var transactionHelper = new TransactionHelper(_dal, _accessor, _env);
+
+                                rechargeAPIHit.Response = res;
+
+                                //Match Api Response Here
+                                tstatus = transactionHelper.MatchResponse(validateReq.OID, rechargeAPIHit, _req.Account).Result;
+
+                                // IsResend Rehit Another Lapu When IsResend=true and IsReLoginLapu=false
+                                if (tstatus.IsResend)
+                                {
+
+                                   // IsReLoginLapu Is Used For Relogin Lapu For Token 
+                                    if (tstatus.IsReLoginLapu)
+                                    {
+                                        ILapuApiML _apiml = new LapuApiML(_accessor, _env, _dapper);
+
+                                        var lapuloginreq = new LapuLoginRequest()
+                                        {
+                                            mobile = item.Mobile,
+                                            password = item.Password
+                                        };
+                                        Response loginRes = _apiml.LapuApiLogin(lapuloginreq, item.UserID, item.LapuID).Result;
+                                        if (loginRes != null)
+                                        {
+                                            if (loginRes.StatusCode == ErrorCodes.One)
+                                            {
+                                                req.access_token = loginRes.CommonStr;
+                                                doTransaction(req, UserID, LapuID);
+                                            }
+                                        }
+                                    }
+                                }
+                                return tstatus;
+                            }
+
+
+                            //ForTesting Purpose Only Start Here
                             //LapuLoginResponse Recres = new LapuLoginResponse();
                             //Recres.Resp_code = "RCS";
                             //Recres.Resp_desc = "Request Completed Successfully";
@@ -220,52 +297,46 @@ namespace Roundpay_Robo.AppCode
                             //Recres.data.code ="0";
 
                             //ForTesting Purpose Only Start End Here
-                            if (Recres != null)
+                            if (tstatus != null)
                             {
-                                if (Recres.Resp_code == LapuResCode.ERR)
+                                response.STATUS = tstatus.Status;
+                                response.OPID = tstatus.OperatorID;
+                                response.MSG = tstatus.ErrorMsg;
+                                response.ERRORCODE = tstatus.ErrorCode;
+                                if (tstatus.Status.In(RechargeRespType.SUCCESS, RechargeRespType.FAILED, RechargeRespType.PENDING))
                                 {
-                                    //update transaction as Failed
-                                    item.Type = 3;
+                                    //update transaction as Failed as success
+                                    item.Type = tstatus.Status;
+                                    item.LiveID = tstatus.OperatorID;
+                                    item.LapuBalance =string.IsNullOrEmpty(tstatus.Balance)?0:Convert.ToDecimal(tstatus.Balance);
+                                    item.ErrorCode = tstatus.ErrorCode;
+                                    item.Message = tstatus.ErrorMsg;
                                     Cres = await UpdateTransaction(item);
-                                    response.ERRORCODE = ErrorCodes.Transaction_Failed_Replace.ToString();
-                                    response.MSG = Recres.Resp_desc;
+                                    response.ERRORCODE = tstatus.ErrorCode;
+                                    response.MSG = tstatus.ErrorMsg;
                                     return response;
-                                }
-                                if (Recres.Resp_code == LapuResCode.RCS)
-                                {
-                                    if (Recres.data.code == "0")
-                                    {
-                                        item.Type = 2;
-                                        item.LiveID = Recres.data.voltTxnId;
-                                        item.LapuBalance = Recres.data.balAfterTxn;
-                                        Cres = await UpdateTransaction(item);
-                                        //Update Transaction
-                                        response.ERRORCODE = ErrorCodes.Transaction_Successful.ToString();
-                                        response.MSG = Recres.Resp_desc;
-                                        return response;
-                                    }
-                                    else
-                                    {
-                                        item.Type = 3;
-                                        Cres = await UpdateTransaction(item);
-                                        response.ERRORCODE = ErrorCodes.Transaction_Failed_Replace.ToString();
-                                        response.MSG = Recres.Resp_desc;
-                                        //Update Transaction as Failed
-                                        return response;
-                                    }
                                 }
                             }
                         }
                     }
                     else
                     {
+                        response.STATUS =RechargeRespType.FAILED;
                         response.ERRORCODE = res.FirstOrDefault().ErrorCode;
                         response.MSG = res.FirstOrDefault().Msg;
                     }
             }
             catch (Exception ex)
             {
-
+                ErrorLog errorLog = new ErrorLog
+                {
+                    ClassName = "LapuML.cs",
+                    FuncName = "LappuApiRecharge",
+                    Error = ex.Message,
+                    LoginTypeID = 1,
+                    UserId = lapurecreq.UserID
+                };
+                var _ = new ProcPageErrorLog(_dal).Call(errorLog);
             }
             return response;
         }
@@ -278,6 +349,9 @@ namespace Roundpay_Robo.AppCode
             dbparams2.Add("Status", ltr.Type, DbType.Int32);
             dbparams2.Add("LiveID", ltr.LiveID, DbType.String);
             dbparams2.Add("LapuCurrentAmt", ltr.LapuBalance, DbType.Decimal);
+            dbparams2.Add("LapuID", ltr.LapuID, DbType.Int32);
+            dbparams2.Add("ErroCode", ltr.ErrorCode, DbType.String);
+            dbparams2.Add("ErrorMessage", ltr.Message, DbType.String);
             var ress = await Task.FromResult(_dapper.Update<Response>("proc_UpdateRechargeTransaction", dbparams2, commandType: CommandType.StoredProcedure));
             return ress;
         }

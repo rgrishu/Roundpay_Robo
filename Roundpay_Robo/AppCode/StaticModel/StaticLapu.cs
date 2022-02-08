@@ -6,4 +6,11 @@
         public const string VRF = "VRF";
         public const string ERR = "ERR";
     }
+
+
+    public static class LapuFailCode
+    {
+        public const string  SessionExpired = "999998";
+      
+    }
 }
