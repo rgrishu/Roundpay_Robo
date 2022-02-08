@@ -359,17 +359,34 @@ namespace Roundpay_Robo.AppCode
         public async Task<Response> SaveLapu(Lapu LapuUserDetail, LoginResponse _lr)
         {
             var dbparams = new DynamicParameters();
-            dbparams.Add("LoginID", _lr.UserID, DbType.String);
-            dbparams.Add("LapuID", LapuUserDetail.LapuID, DbType.String);
-            dbparams.Add("VendorID", LapuUserDetail.VendorID, DbType.String);
-            dbparams.Add("ProviderID", LapuUserDetail.ProviderID, DbType.String);
-            dbparams.Add("LapuNickName", LapuUserDetail.LapuNickName, DbType.String);
-            dbparams.Add("LapuNo", LapuUserDetail.LapuNo, DbType.String);
-            dbparams.Add("lapuUserId", LapuUserDetail.LapuUserID, DbType.String);
-            dbparams.Add("Password", LapuUserDetail.Password, DbType.String);
-            dbparams.Add("LapuPin", LapuUserDetail.Pin, DbType.String);
-            dbparams.Add("OtherVendorName", LapuUserDetail.OtherVendorName, DbType.String);
-            var res = await Task.FromResult(_dapper.Insert<Response>("proc_AddLapuDetial", dbparams, commandType: CommandType.StoredProcedure));
+            Response res = new Response();
+            try
+            {
+                dbparams.Add("LoginID", _lr.UserID, DbType.String);
+                dbparams.Add("LapuID", LapuUserDetail.LapuID, DbType.String);
+                dbparams.Add("VendorID", LapuUserDetail.VendorID, DbType.String);
+                dbparams.Add("LapuTypeID", LapuUserDetail.LapuTypeID, DbType.String);
+                dbparams.Add("ProviderID", LapuUserDetail.ProviderID, DbType.String);
+                dbparams.Add("LapuNickName", LapuUserDetail.LapuNickName, DbType.String);
+                dbparams.Add("LapuNo", LapuUserDetail.LapuNo, DbType.String);
+                dbparams.Add("lapuUserId", LapuUserDetail.LapuUserID, DbType.String);
+                dbparams.Add("Password", LapuUserDetail.Password, DbType.String);
+                dbparams.Add("LapuPin", LapuUserDetail.Pin, DbType.String);
+                dbparams.Add("OtherVendorName", LapuUserDetail.OtherVendorName, DbType.String);
+                res = await Task.FromResult(_dapper.Insert<Response>("proc_AddLapuDetial", dbparams, commandType: CommandType.StoredProcedure));
+
+            }
+            catch(Exception ex)
+            {
+                var _ = new ProcPageErrorLog(_dal).Call(new ErrorLog
+                {
+                    ClassName = GetType().Name,
+                    FuncName = "SaveLapu",
+                    Error = ex.Message,
+                    LoginTypeID = _lr.LoginTypeID,
+                    UserId = _lr.UserID
+                });
+            }
             return res;
         }
         public async Task<Response> DeleteLapu(int LapuID, LoginResponse _lr)
@@ -395,10 +412,21 @@ namespace Roundpay_Robo.AppCode
             var res = await Task.FromResult(_dapper.Insert<Response>("Proc_Update_lapuStatus", dbparams, commandType: CommandType.StoredProcedure));
             return res;
         }
-        public async Task<List<LapuReport>> GetLapuReport(LoginResponse _lr)
+        public async Task<List<LapuReport>> GetLapuReport(LapuReport Filter, LoginResponse _lr)
         {
-            var dbparams = new DynamicParameters();
-            var res = await Task.FromResult(_dapper.GetAll<LapuReport>("proc_SelectLapuRechargeReport", dbparams, commandType: CommandType.StoredProcedure));
+            List<LapuReport> res = new List<LapuReport>();
+            try {
+                var dbparams = new DynamicParameters();
+                dbparams.Add("Type", Filter.Type, DbType.Int32);
+                dbparams.Add("AccountNo", Filter.AccountNo??"", DbType.String);
+                dbparams.Add("TransactionID", Filter.TransactionID??"", DbType.String);
+                dbparams.Add("LapuNo",string.IsNullOrEmpty(Filter.LapuNo)?"": Filter.LapuNo, DbType.String);
+                dbparams.Add("LapuNo",Filter.AccountNo??"", DbType.String);
+                dbparams.Add("LiveID", Filter.LiveID??"", DbType.String);
+                res = await Task.FromResult(_dapper.GetAll<LapuReport>("proc_SelectLapuRechargeReport", dbparams, commandType: CommandType.StoredProcedure));
+                
+            }
+            catch { }
             return res;
         }
         public async Task<Response> DeleteLapuVendor(int ID, LoginResponse _lr)
@@ -416,6 +444,19 @@ namespace Roundpay_Robo.AppCode
             dbparams.Add("VendorID", ID, DbType.String);
             //var res = await Task.FromResult(_dapper.Insert<Lapu>("proc_GetLapuList", dbparams, commandType: CommandType.StoredProcedure));
             var res = await Task.FromResult(_dapper.Get<VendorMaster>("Proc_SelectEditVendor", dbparams, commandType: CommandType.StoredProcedure));
+            return res;
+        }
+        public async Task<List<Lapu>> GetVendorLapu(LoginResponse _lr)
+        {
+            var dbparams = new DynamicParameters();
+            dbparams.Add("LoginID", _lr.UserID, DbType.String);
+            var res = await Task.FromResult(_dapper.GetAll<Lapu>("Proc_getVendor", dbparams, commandType: CommandType.StoredProcedure));
+            return res;
+        }
+        public async Task<List<LapuServices>> GetServices(LoginResponse _lr)
+        {
+            var dbparams = new DynamicParameters();
+            var res = await Task.FromResult(_dapper.GetAll<LapuServices>("proc_selectLapuService", dbparams, commandType: CommandType.StoredProcedure));
             return res;
         }
     }

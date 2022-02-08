@@ -1,35 +1,77 @@
-﻿<div class="wrapper">
+﻿
+<div class="wrapper">
     <div class="container-fluid">
         <div class="row">
             <div class="col-xl-12">
                 <div class="card">
                     <div class="card-header bg-primary text-light">
                         <div class="header-title">
-                            <i class="mdi mdi-book-open-page-variant"></i> Lapu Recharge Report
+                            <div class="row">
+                                <div class="col-sm-12 h5">
+                                    <i class="mdi mdi-book-open-page-variant"></i> Lapu Recharge Report
+                                </div>
+                                <div class="col-sm-2">
+                                    <select title="Top" class="form-control" id="ddlTop">
+                                        <option value="50">: ALL :</option>
+                                        <option value="10">10</option>
+                                        <option value="20">20</option>
+                                        <option value="30">30</option>
+                                        <option value="40">40</option>
+                                        <option value="50">50</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-2">
+                                    <select title="Status" class="form-control" id="ddlStatus">
+                                        <option value="0">: ALL :</option>
+                                        <option value="1">Pending</option>
+                                        <option value="2">Success</option>
+                                        <option value="3">Failed</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-2">
+                                    <input title="Lapu No" type="text" class="form-control" placeholder="Lapu No" id="LapuNo" />
+                                </div>
+                                <div class="col-sm-2">
+                                    <input title="Account No" type="text" class="form-control" placeholder="Account No" id="AccountNo" />
+                                </div>
+                                <div class="col-sm-2">
+                                    <input title="Transaction ID" type="text" class="form-control" placeholder="Transaction ID" id="TransactionID" />
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="input-group">
+                                        <input title="Live ID" type="text" class="form-control" placeholder="Live ID" id="Liveid">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-sm btn-light" type="button" id="FilterLapuReport" onclick = "filterLapuReport()">
+                                                <i class="fa fa-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-bordered table-striped table-responsive-sm" id="tblLapu">
                                 <thead class="bg-tableth">
                                     <tr>
-                                        <th scope="col">#</th>
-                                        <th scope="col" class="text-nowrap">Transaction ID</th>
-                                        <th scope="col" class="text-nowrap">Account No</th>
-                                        <th scope="col" class="text-nowrap">Outlet Name</th>
-                                        <th scope="col" class="text-nowrap">Provider</th>
-                                        <th scope="col" class="text-nowrap">Entry Date</th>
-                                        <th scope="col" class="text-nowrap">Modify Date</th>
-                                        <th scope="col" class="text-nowrap">Lapu Opening</th>
-                                        <th scope="col" class="text-nowrap">Recharge Amount</th>
-                                        <th scope="col" class="text-nowrap">Lapu Closing</th>
-                                        <th scope="col" class="text-nowrap">Lapu No</th>
-                                        <th scope="col" class="text-nowrap">Live ID</th>
-                                        <th scope="col">Status</th>
+                                        <th>#</th>
+                                        <th>Transaction ID</th>
+                                        <th>Account No</th>
+                                        <th>Outlet Name</th>
+                                        <th>Provider</th>
+                                        <th>Entry Date</th>
+                                        <th>Modify Date</th>
+                                        <th>Lapu Opening</th>
+                                        <th>Recharge Amount</th>
+                                        <th>Lapu Closing</th>
+                                        <th>Lapu No</th>
+                                        <th>Live ID</th>
+                                        <th>Status</th>
                                         @*<th scope="col">Action</th>*@
                                     </tr>
                                 </thead>
-                                <tbody style="height: 310px;"></tbody>
+                                <tbody></tbody>
                             </table>
                         </div>
                     </div>
@@ -41,17 +83,38 @@
 @section scripts{
 <script>
     $(document).ready(function(){
-        LoadLapuReport();
+       filterLapuReport();
+        $("#ddlTop").tooltip();
+        $("#ddlStatus").tooltip();
+        $("#LapuNo").tooltip();
+        $("#AccountNo").tooltip();
+        $("#TransactionID").tooltip();
+        $("#Liveid").tooltip();
     });
-    function LoadLapuReport(){
-    $.get("GetLapuReport").done(function(result){
-        $("tbody").html(result);
-       
-    }).fail(function(xhr){
-        an.title = "Wow !"
-        an.content = "Error Occured";
-        an.alert(an.type.failed);
-    });
+    //function LoadLapuReport(){
+    //$.get("GetLapuReport").done(function(result){
+    //    $("tbody").html(result);
+
+    //}).fail(function(xhr){
+    //    an.title = "Wow !"
+    //    an.content = "Error Occured";
+    //    an.alert(an.type.failed);
+    //});
+    //}
+    function filterLapuReport(){
+        debugger
+        var Filter = {
+            Type: $("#ddlStatus").val(),
+            LapuNo: $("#LapuNo").val(),
+            AccountNo: $("#AccountNo").val(),
+            TransactionID: $("#TransactionID").val(),
+            LiveID: $("#Liveid").val()
+        }
+        $.post("GetLapuReport", Filter).done(function(result){
+            $("tbody").html(result);
+        }).fail(function(xhr){
+        alert("Failed");
+        });
     }
 </script>
 }

@@ -4,6 +4,7 @@ using Roundpay_Robo.AppCode.Configuration;
 using Roundpay_Robo.AppCode.Interfaces;
 using Roundpay_Robo.AppCode.Model;
 using Roundpay_Robo.AppCode.StaticModel;
+using Roundpay_Robo.Models;
 using Roundpay_Robo.Services;
 
 namespace Roundpay_Robo.Controllers
@@ -41,12 +42,12 @@ namespace Roundpay_Robo.Controllers
         {
             return View();
         }
-        [HttpGet]
+        [HttpPost]
         [Route("GetLapuReport")]
-        public IActionResult GetLapuRport()
+        public IActionResult GetLapuRport(LapuReport Filter)
         {
             ILapuML _lml = new LapuML(_accessor,_env,_dapper);
-            var res = _lml.GetLapuReport(_lr).Result;
+            var res = _lml.GetLapuReport(Filter ,_lr).Result;
             return PartialView("PartialView/_LapuReport", res);
         }
     }

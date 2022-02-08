@@ -21,6 +21,7 @@
         public int LapuLoginStatus { get; set; }
         public DateTime EntryDate { get; set; }
         public bool IsDeleted { get; set; }
+        public int LapuTypeID { get; set; }
     }
     public class LapuLoginRequest
     {
@@ -114,7 +115,7 @@
         public string Method { get; set; }
     }
 
-    public class LapuTransaction:Lapu
+    public class LapuTransaction : Lapu
     {
         public int StatusCode { get; set; }
         public string Msg { get; set; }
@@ -125,7 +126,7 @@
         public string Category { get; set; }
         public int Type { get; set; }
         public string TransactionID { get; set; }
- 
+
         public string ErrorCode { get; set; }
         public string Message { get; set; }
         public decimal Balance { get; set; }
@@ -150,6 +151,7 @@
 
     public class LapuReport
     {
+        public int LapuID { get; set; }
         public string TransactionID { get; set; }
         public string AccountNo { get; set; }
         public string OutletName { get; set; }
@@ -159,11 +161,23 @@
         public string LapuOpening { get; set; }
         public decimal RechargeAmount { get; set; }
         public string LapuClosing { get; set; }
-        public string lapuNo { get; set; }
-        public string LiveID { get; set; }
-        public bool Status { get; set; }
+        public string LapuNo { get; set; }
+        public string LiveID { get; set; }        
+        public int Type { get; set; }
+        public string TransactionStatus { get; set; }
+    }
+    public class LapuServices : Lapu
+    {
+        public int ID { get; set; }
+        public int LapuTypeID { get; set; }
+        public int SID { get; set; }
+        public string Name { get; set; }
     }
 
 
-
+    public class SeviceVendorVM
+    {
+        public List<Lapu> listLAPU { get; set; }
+        public List<LapuServices> listLapuServices { get; set; }
+    }
 }
