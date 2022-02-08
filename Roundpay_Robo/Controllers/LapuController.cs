@@ -37,11 +37,18 @@ namespace Roundpay_Robo.Controllers
         }
         [HttpPost]
         [Route("LapuAdd")]
-        public IActionResult AddLApu(Lapu lapu)
+        public IActionResult AddLApu()
         {
-            return PartialView("PartialView/_AddLapu", lapu);
-        }
+            ILapuML _lml2 = new LapuML(_accessor, _env, _dapper);
+            var res1 = _lml2.GetServices(_lr).Result;
+            ILapuML _lml = new LapuML(_accessor, _env, _dapper);
+            var res = _lml.GetVendorLapu(_lr).Result;
+            SeviceVendorVM model = new SeviceVendorVM();
+            model.listLAPU = res;
+            model.listLapuServices = res1;
 
+            return PartialView("PartialView/_AddLapu", model);
+        }
         [HttpPost]
         [Route("LapuList")]
         public IActionResult GetLapuList()
@@ -98,21 +105,21 @@ namespace Roundpay_Robo.Controllers
         [Route("SaveLapuBtn")]
         public async Task<IActionResult> SaveLapu(Lapu LapuUserDetail)
         {
-            ILapuML _lml = new  LapuML(_accessor, _env, _dapper);
+            ILapuML _lml = new LapuML(_accessor, _env, _dapper);
             return Json(_lml.SaveLapu(LapuUserDetail, _lr));
         }
         [HttpPost]
         [Route("DeleteLapuDetail/{LapuID}")]
         public async Task<IActionResult> DeleteLapu(int LapuID)
         {
-            ILapuML _lml = new  LapuML(_accessor, _env, _dapper);
+            ILapuML _lml = new LapuML(_accessor, _env, _dapper);
             return Json(_lml.DeleteLapu(LapuID, _lr));
         }
         [HttpGet]
         [Route("GetEditLapuDetail/{LapuID}")]
         public IActionResult GetEditLapuList(int LapuID)
         {
-            ILapuML _lml = new  LapuML(_accessor, _env, _dapper);
+            ILapuML _lml = new LapuML(_accessor, _env, _dapper);
             var res = _lml.GetEditLapulist(LapuID, _lr).Result;
             return PartialView("PartialView/_Addlapu", res);
         }
@@ -120,9 +127,16 @@ namespace Roundpay_Robo.Controllers
         [Route("UpdateLapuStatus/{LapuID}")]
         public IActionResult UpdatelapuStatus(int LapuID)
         {
-            ILapuML _lml = new  LapuML(_accessor, _env, _dapper);
+            ILapuML _lml = new LapuML(_accessor, _env, _dapper);
             return Json(_lml.UpdateLapuStatus(LapuID, _lr));
         }
-
+        //[HttpGet]
+        //[Route("GetVendorLapu")]
+        //public IActionResult GetVendorLapu()
+        //{
+        //    ILapuML _lml = new LapuML(_accessor, _env, _dapper);
+        //    var res = _lml.GetVendorLapu(_lr).Result;
+        //    return PartialView("PartialView/_AddLapu", res);
+        //}
     }
 }

@@ -24,8 +24,10 @@ namespace Roundpay_Robo.AppCode.Interfaces
         Task<Response> DeleteLapu(int LapuID, LoginResponse _lr);
         Task<Lapu> GetEditLapulist(int LapuID, LoginResponse _lr);
         Task<Response> UpdateLapuStatus(int LapuID, LoginResponse _lr);
-        Task<List<LapuReport>> GetLapuReport(LoginResponse _lr);
+        Task<List<LapuReport>> GetLapuReport(LapuReport Filter, LoginResponse _lr);
         Task<Response> DeleteLapuVendor(int ID, LoginResponse _lr);
         Task<VendorMaster> SelectEditVendor(int ID, LoginResponse _lr);
+        Task<List<Lapu>> GetVendorLapu(LoginResponse _lr);
+        Task<List<LapuServices>> GetServices(LoginResponse _lr);
     }
 }

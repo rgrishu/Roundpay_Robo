@@ -1,26 +1,44 @@
 ﻿@model IEnumerable<Roundpay_Robo.Models.LapuReport>
 
-@if(Model.Any()){
-   int i = 0;
-    foreach(var item in Model)
+@if (Model.Any())
+{
+    int i = 0;
+    foreach (var item in Model)
     {
         i++;
         <tr>
             <td>@i</td>
-            <td class="text-nowrap">@item.TransactionID</td>
-            <td class="text-nowrap">@item.AccountNo</td>
-            <td class="text-nowrap">@item.OutletName</td>
-            <td class="text-nowrap">@item.Provider</td>
-            <td class="text-nowrap">@item.EntryDate</td>
-            <td class="text-nowrap">@item.ModifyDate</td>
-            <td class="text-nowrap">@item.LapuOpening</td>
-            <td class="text-nowrap">@item.RechargeAmount</td>
-            <td class="text-nowrap">@item.LapuClosing</td>
-            <td class="text-nowrap">@item.lapuNo</td>
+            <td>@item.TransactionID</td>
+            <td>@item.AccountNo</td>
+            <td>@item.OutletName</td>
+            <td>@item.Provider</td>
+            <td>@item.EntryDate</td>
+            <td>@item.ModifyDate</td>
+            <td>@item.LapuOpening</td>
+            <td>@item.RechargeAmount</td>
+            <td>@item.LapuClosing</td>
+            <td>@item.LapuNo</td>
             <td>@item.LiveID</td>
-            <td>@item.Status</td>            
+            <td>
+                @if (@item.Type == 1)
+                {
+                    <a class="btn btn-sm btn-warning text-light">Pending</a>
+                }
+                @if (@item.Type == 2)
+                {
+                    <a class="btn btn-sm btn-success text-light">Success</a>
+                }
+                @if (@item.Type == 3)
+                {
+                    <a class="btn btn-sm btn-danger text-light">Failed</a>
+                }
+            </td>
             @*<td class="text-nowrap"> <a class="btn btn-sm btn-danger text-light" onclick="btnDelete()"><i class="fas fa-trash"></i></a>
                 <a class="btn btn-sm btn-info text-light" onclick="btnEditLapu()"><i class="fas fa-pen"></i></a></td>*@
         </tr>
     }
+}
+else
+{
+    <tr>No Data to Display</tr>
 }
