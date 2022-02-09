@@ -8,6 +8,7 @@ using Roundpay_Robo.Models;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Roundpay_Robo.AppCode.StaticModel;
 
 namespace Roundpay_Robo.AppCode.Interfaces
 {
@@ -25,8 +26,11 @@ namespace Roundpay_Robo.AppCode.Interfaces
 
     }
     public interface IResourceML
-    {
-      
+    {        
+        void CreateWebsiteDirectory(int WID, string _FolderType);
+        StringBuilder GetLogoURL(int WID);
+
+
     }
     public interface IBannerML
     {

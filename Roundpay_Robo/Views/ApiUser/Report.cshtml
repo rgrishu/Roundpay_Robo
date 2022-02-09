@@ -1,5 +1,4 @@
-﻿
-<div class="wrapper">
+﻿<div class="wrapper">
     <div class="container-fluid">
         <div class="row">
             <div class="col-xl-12">
@@ -7,22 +6,23 @@
                     <div class="card-header bg-primary text-light">
                         <div class="header-title">
                             <div class="row">
-                                <div class="col-sm-12 h5">
+                                <div class="col-sm-12 h6">
                                     <i class="mdi mdi-book-open-page-variant"></i> Lapu Recharge Report
                                 </div>
                                 <div class="col-sm-2">
                                     <select title="Top" class="form-control" id="ddlTop">
-                                        <option value="50">: ALL :</option>
+                                        <option value="500">:: ALL ::</option>
                                         <option value="10">10</option>
                                         <option value="20">20</option>
-                                        <option value="30">30</option>
-                                        <option value="40">40</option>
                                         <option value="50">50</option>
+                                        <option value="100">100</option>
+                                        <option value="300">300</option>
+                                        <option value="500">500</option>
                                     </select>
                                 </div>
                                 <div class="col-sm-2">
                                     <select title="Status" class="form-control" id="ddlStatus">
-                                        <option value="0">: ALL :</option>
+                                        <option value="0">:: ALL ::</option>
                                         <option value="1">Pending</option>
                                         <option value="2">Success</option>
                                         <option value="3">Failed</option>
@@ -102,8 +102,9 @@
     //});
     //}
     function filterLapuReport(){
-        debugger
+        debugger;
         var Filter = {
+            Top: $("#ddlTop").val(),
             Type: $("#ddlStatus").val(),
             LapuNo: $("#LapuNo").val(),
             AccountNo: $("#AccountNo").val(),
@@ -113,7 +114,9 @@
         $.post("GetLapuReport", Filter).done(function(result){
             $("tbody").html(result);
         }).fail(function(xhr){
-        alert("Failed");
+        an.title="Oops !";
+        an.content = "Server Error !";
+        an.alert(an.type.failed);
         });
     }
 </script>

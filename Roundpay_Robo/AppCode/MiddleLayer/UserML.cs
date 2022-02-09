@@ -32,6 +32,9 @@ using System.Threading.Tasks;
 using Validators;
 using Roundpay_Robo.AppCode.MiddleLayer;
 using Roundpay_Robo.AppCode.DL;
+using RoundpayFinTech.AppCode.StaticModel;
+using RoundpayFinTech.AppCode.MiddleLayer;
+using RoundpayFinTech.AppCode.Interfaces;
 
 namespace Roundpay_Robo.AppCode
 {
@@ -138,19 +141,18 @@ namespace Roundpay_Robo.AppCode
                 IProcedure _p = new ProcSignup(_dal);
                 var res = (AlertReplacementModel)_p.Call(_req);
                 _resp.Msg = res.Msg;
-                if (res.Statuscode == ErrorCodes.One)
-                {
-                    _resp.Statuscode = res.Statuscode;
+                //if (res.Statuscode == ErrorCodes.One)
+                //{
+                //    _resp.Statuscode = res.Statuscode;
 
-                   // if (_req.IsWebsite && res.WID > 0)
-                   // {
-                   //     _resourceML.CreateWebsiteDirectory(res.WID, FolderType.Website);
-                   // }
-                   // IAlertML alertMl = new AlertML(_accessor, _env);
-                   // Parallel.Invoke(() => alertMl.RegistrationSMS(res),
-                   //() => alertMl.RegistrationEmail(res),
-                   //() => alertMl.SocialAlert(res));
-                }
+                //    if (_req.IsWebsite && res.WID > 0)
+                //    {
+                //        _resourceML.CreateWebsiteDirectory(res.WID, FolderType.Website);
+                //    }
+                //    IAlertML alertMl = new AlertML(_accessor, _env);
+                //    Parallel.Invoke(() => alertMl.RegistrationSMS(res),
+                //   () => alertMl.RegistrationEmail(res));
+                //}
             }
             return _resp;
         }
@@ -188,6 +190,11 @@ namespace Roundpay_Robo.AppCode
                 result = _lrEmp;
             }
             return result;
+        }
+
+        public bool IsEndUser()
+        {
+            throw new NotImplementedException();
         }
     }
 }
