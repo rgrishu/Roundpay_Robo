@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Newtonsoft.Json;
 using Roundpay_Robo.AppCode.Configuration;
+using Roundpay_Robo.AppCode.DB;
 using Roundpay_Robo.AppCode.DL;
 using Roundpay_Robo.AppCode.Interfaces;
 using Roundpay_Robo.AppCode.Model;
@@ -21,6 +22,8 @@ namespace Roundpay_Robo.AppCode
         private readonly IDapper _dapper;
         private readonly LapuAppSetting appSetting;
         private readonly IConfiguration Configuration;
+        private readonly IConnectionConfiguration _c;
+        private readonly IDAL _dal;
         #endregion
         public LapuApiML(IHttpContextAccessor accessor, Microsoft.AspNetCore.Hosting.IHostingEnvironment env, IDapper dapper)
         {
@@ -32,6 +35,8 @@ namespace Roundpay_Robo.AppCode
             builder.AddJsonFile((_env.IsProduction() ? "appsettings.json" : "appsettings.Development.json"));
             builder.AddEnvironmentVariables();
             Configuration = builder.Build();
+            _c = new ConnectionConfiguration(_accessor, _env);
+            _dal = new DAL(_c.GetConnectionString());
             appSetting = AppSetting();
         }
         public LapuAppSetting AppSetting()
@@ -271,38 +276,39 @@ namespace Roundpay_Robo.AppCode
 
         public async Task<string> InitiateTransaction(InitiateTransaction initiatetransaction, int UserID, int LapuID)
         {
-            LapuLoginResponse response = new LapuLoginResponse();
-            initiatetransaction.token = appSetting.Token;
-
-           // string ULRRec = appSetting.URL + "Action/test";
-            string ULRRec = appSetting.URL + "Action/init_txn";
-            var recres = await AppWebRequest.O.PostJsonDataUsingHWRAsync(ULRRec, initiatetransaction).ConfigureAwait(false);
-            var LapuApiReqResForDB2 = new LapuApiReqResForDB()
+            var recres = string.Empty;
+            try
             {
-                UserID = UserID,
-                LapuID = LapuID,
-                URL = ULRRec,
-                Request = Newtonsoft.Json.JsonConvert.SerializeObject(initiatetransaction),
-                Response = recres,
-                ClassName = "InitiateTransaction",
-                Method = "Post"
-            };
-            SaveLapuReqRes(LapuApiReqResForDB2);
-            //if (!string.IsNullOrEmpty(recres))
-            //{
-            //    var lappuerror = JsonConvert.DeserializeObject<LapuError>(recres);
-            //    if (lappuerror.Resp_code == LapuResCode.ERR)
-            //    {
-            //        response.Resp_code = lappuerror.Resp_code;
-            //        response.Resp_desc = lappuerror.Resp_desc;
-            //        return response;
-            //    }
-            //    else
-            //    {
-            //        var otpobjres = JsonConvert.DeserializeObject<LapuLoginResponse>(recres);
-            //        response = otpobjres;
-            //    }
-            //}
+               
+                initiatetransaction.token = appSetting.Token;
+
+                // string ULRRec = appSetting.URL + "Action/test";
+                string ULRRec = appSetting.URL + "Action/init_txn";
+                recres = await AppWebRequest.O.PostJsonDataUsingHWRAsync(ULRRec, initiatetransaction).ConfigureAwait(false);
+                var LapuApiReqResForDB2 = new LapuApiReqResForDB()
+                {
+                    UserID = UserID,
+                    LapuID = LapuID,
+                    URL = ULRRec,
+                    Request = Newtonsoft.Json.JsonConvert.SerializeObject(initiatetransaction),
+                    Response = recres,
+                    ClassName = "InitiateTransaction",
+                    Method = "Post"
+                };
+                SaveLapuReqRes(LapuApiReqResForDB2);
+            }
+            catch(Exception ex)
+            {
+                ErrorLog errorLog = new ErrorLog
+                {
+                    ClassName = "LapuAPIML.cs",
+                    FuncName = "InitiateTransaction",
+                    Error = ex.Message,
+                    LoginTypeID = 1,
+                    UserId = UserID
+                };
+                var _ = new ProcPageErrorLog(_dal).Call(errorLog);
+            }
             return recres;
         }
 
@@ -323,7 +329,15 @@ namespace Roundpay_Robo.AppCode
             }
             catch (Exception ex)
             {
-
+                ErrorLog errorLog = new ErrorLog
+                {
+                    ClassName = "LapuAPIML.cs",
+                    FuncName = "SaveLapuReqRes",
+                    Error = ex.Message,
+                    LoginTypeID = 1,
+                    UserId = larr!=null?larr.UserID:0,
+                };
+                var _ = new ProcPageErrorLog(_dal).Call(errorLog);
             }
         }
 
