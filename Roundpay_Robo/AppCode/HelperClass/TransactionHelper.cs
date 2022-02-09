@@ -337,6 +337,12 @@ namespace Roundpay_Robo.AppCode.HelperClass
                 tstatus.ErrorMsg = errorCodes.Error;
                 tstatus.OperatorID = errorCodes.Error;
             }
+
+            if (tstatus.ErrorCode == ErrorCodes.Unknown_Error.ToString())
+            {
+                tstatus.ErrorCode = "158";
+                tstatus.ErrorMsg = tstatus.APIMsg;
+            }
             return tstatus;
         }
         public ResponseStatus CheckIfKeyExistsInDatatable(DataTable dt, string Key)

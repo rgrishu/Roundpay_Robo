@@ -279,23 +279,19 @@ namespace Roundpay_Robo.AppCode
             var recres = string.Empty;
             try
             {
-               
                 initiatetransaction.token = appSetting.Token;
-
                 // string ULRRec = appSetting.URL + "Action/test";
                 string ULRRec = appSetting.URL + "Action/init_txn";
                 recres = await AppWebRequest.O.PostJsonDataUsingHWRAsync(ULRRec, initiatetransaction).ConfigureAwait(false);
-                var LapuApiReqResForDB2 = new LapuApiReqResForDB()
-                {
-                    UserID = UserID,
-                    LapuID = LapuID,
-                    URL = ULRRec,
-                    Request = Newtonsoft.Json.JsonConvert.SerializeObject(initiatetransaction),
-                    Response = recres,
-                    ClassName = "InitiateTransaction",
-                    Method = "Post"
-                };
-               await SaveLapuReqRes(LapuApiReqResForDB2);
+                var dbparams = new DynamicParameters();
+                dbparams.Add("UserID", UserID, DbType.Int32);
+                dbparams.Add("LapuID", LapuID, DbType.Int32);
+                dbparams.Add("URL", ULRRec, DbType.String);
+                dbparams.Add("Request", Newtonsoft.Json.JsonConvert.SerializeObject(initiatetransaction), DbType.String);
+                dbparams.Add("Response", recres, DbType.String);
+                dbparams.Add("ClassName", "InitiateTransaction", DbType.String);
+                dbparams.Add("Method", "Post", DbType.String);
+               Task.FromResult(_dapper.Insert<Response>("proc_SaveLapuReqRes", dbparams, commandType: CommandType.StoredProcedure));
             }
             catch(Exception ex)
             {
