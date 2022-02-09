@@ -107,6 +107,7 @@
     public class LapuApiReqResForDB
     {
         public int UserID { get; set; }
+        public int TID { get; set; }
         public int LapuID { get; set; }
         public string URL { get; set; }
         public string Request { get; set; }

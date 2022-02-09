@@ -243,15 +243,15 @@ namespace Roundpay_Robo.AppCode
                             rechargeAPIHit.LoginID = validateReq.LoginID;
                             rechargeAPIHit.IsException = false;
 
-                            var tstatus = doTransaction(req, item.UserID, item.LapuID);
+                            var tstatus = doTransaction(req, item.UserID, item.LapuID, item.TID);
 
-                            TransactionStatus doTransaction(InitiateTransaction req, int UserID, int LapuID)
+                            TransactionStatus doTransaction(InitiateTransaction req, int UserID, int LapuID,int  TID)
                             {
                                 TransactionStatus tstatus = new TransactionStatus();
 
                                 //intiate  api transaction For Recharge
 
-                                string res = apiml.InitiateTransaction(req, UserID, LapuID).Result;
+                                string res = apiml.InitiateTransaction(req, UserID, LapuID, TID).Result;
                                 var transactionHelper = new TransactionHelper(_dal, _accessor, _env);
 
                                 rechargeAPIHit.Response = res;
@@ -279,7 +279,7 @@ namespace Roundpay_Robo.AppCode
                                             if (loginRes.StatusCode == ErrorCodes.One)
                                             {
                                                 req.access_token = loginRes.CommonStr;
-                                                doTransaction(req, UserID, LapuID);
+                                                doTransaction(req, UserID, LapuID, TID);
                                             }
                                         }
                                     }

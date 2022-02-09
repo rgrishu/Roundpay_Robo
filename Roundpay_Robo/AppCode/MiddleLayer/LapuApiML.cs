@@ -274,7 +274,7 @@ namespace Roundpay_Robo.AppCode
 
 
 
-        public async Task<string> InitiateTransaction(InitiateTransaction initiatetransaction, int UserID, int LapuID)
+        public async Task<string> InitiateTransaction(InitiateTransaction initiatetransaction, int UserID, int LapuID,int TID)
         {
             var recres = string.Empty;
             try
@@ -285,6 +285,7 @@ namespace Roundpay_Robo.AppCode
                 recres = await AppWebRequest.O.PostJsonDataUsingHWRAsync(ULRRec, initiatetransaction).ConfigureAwait(false);
                 var dbparams = new DynamicParameters();
                 dbparams.Add("UserID", UserID, DbType.Int32);
+                dbparams.Add("TID", TID, DbType.Int32);
                 dbparams.Add("LapuID", LapuID, DbType.Int32);
                 dbparams.Add("URL", ULRRec, DbType.String);
                 dbparams.Add("Request", Newtonsoft.Json.JsonConvert.SerializeObject(initiatetransaction), DbType.String);
@@ -315,6 +316,7 @@ namespace Roundpay_Robo.AppCode
             {
                 var dbparams = new DynamicParameters();
                 dbparams.Add("UserID", larr.UserID, DbType.Int32);
+                dbparams.Add("TID", larr.TID, DbType.Int32);
                 dbparams.Add("LapuID", larr.LapuID, DbType.Int32);
                 dbparams.Add("URL", larr.URL, DbType.String);
                 dbparams.Add("Request", larr.Request, DbType.String);

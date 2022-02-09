@@ -14,6 +14,6 @@ namespace Roundpay_Robo.AppCode.Interfaces
         Task<Response> LapuApiLogin(LapuLoginRequest lapuloginreq, int UserID, int LapuID, bool FromBalance = false);
         Task<Response> LapuApiBalance(LapuLoginRequest lapuloginreq, LoginResponse _lr, int LapuID);
         Task<Response> LapuLoginOtpValidate(ValidateLapuLoginOTP lapuloginotpval, LoginResponse _lr, int LapuID);
-        Task<string> InitiateTransaction(InitiateTransaction initiatetransaction, int USerID, int LapuID);
+        Task<string> InitiateTransaction(InitiateTransaction initiatetransaction, int USerID, int LapuID, int TID);
     }
 }
