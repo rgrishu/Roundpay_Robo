@@ -40,6 +40,11 @@ namespace Roundpay_Robo.Controllers
         [Route("Report")]
         public IActionResult Report()
         {
+            if (loginML.IsInValidSession())
+            {
+                return RedirectToAction("Index", "Login");
+            }
+
             return View();
         }
         [HttpPost]

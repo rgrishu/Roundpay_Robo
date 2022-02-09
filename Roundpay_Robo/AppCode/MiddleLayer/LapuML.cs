@@ -270,7 +270,7 @@ namespace Roundpay_Robo.AppCode
 
                                         var lapuloginreq = new LapuLoginRequest()
                                         {
-                                            mobile = item.Mobile,
+                                            mobile = item.LapuNo,
                                             password = item.Password
                                         };
                                         Response loginRes = _apiml.LapuApiLogin(lapuloginreq, item.UserID, item.LapuID).Result;
@@ -286,7 +286,6 @@ namespace Roundpay_Robo.AppCode
                                 }
                                 return tstatus;
                             }
-
 
                             //ForTesting Purpose Only Start Here
                             //LapuLoginResponse Recres = new LapuLoginResponse();
