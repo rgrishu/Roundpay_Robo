@@ -334,14 +334,19 @@ namespace Roundpay_Robo.AppCode.HelperClass
             {
                 var errorCodes = _errCodeML.Get(ErrorCodes.Unknown_Error.ToString());
                 tstatus.IsResend = errorCodes.IsResend;
-                tstatus.ErrorMsg = errorCodes.Error;
-                tstatus.OperatorID = errorCodes.Error;
+
+                tstatus.ErrorCode = "158";
+                tstatus.ErrorMsg = tstatus.APIMsg;
+                tstatus.OperatorID = tstatus.APIMsg;
+                //tstatus.ErrorMsg = errorCodes.Error;
+                //tstatus.OperatorID = errorCodes.Error;
             }
 
             if (tstatus.ErrorCode == ErrorCodes.Unknown_Error.ToString())
             {
                 tstatus.ErrorCode = "158";
                 tstatus.ErrorMsg = tstatus.APIMsg;
+                tstatus.OperatorID = tstatus.APIMsg;
             }
             return tstatus;
         }
