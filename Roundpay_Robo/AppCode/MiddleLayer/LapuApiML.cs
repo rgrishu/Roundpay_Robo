@@ -291,7 +291,7 @@ namespace Roundpay_Robo.AppCode
                 dbparams.Add("Response", recres, DbType.String);
                 dbparams.Add("ClassName", "InitiateTransaction", DbType.String);
                 dbparams.Add("Method", "Post", DbType.String);
-               Task.FromResult(_dapper.Insert<Response>("proc_SaveLapuReqRes", dbparams, commandType: CommandType.StoredProcedure));
+               _dapper.Insert<Response>("proc_SaveLapuReqRes", dbparams, commandType: CommandType.StoredProcedure);
             }
             catch(Exception ex)
             {

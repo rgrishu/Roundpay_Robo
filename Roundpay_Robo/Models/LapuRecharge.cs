@@ -11,7 +11,7 @@ namespace Roundpay_Robo.Models
         public string SPKey { get; set; }
         public string Account { get; set; }
         public decimal Amount { get; set; }
-        public int APIRequestID { get; set; }
+        public string APIRequestID { get; set; }
     }
     public class _LapuRechargeRequest : LapuRechargeRequest
     {
@@ -28,7 +28,7 @@ namespace Roundpay_Robo.Models
         public string ACCOUNT { get; set; }
         public decimal Amount { get; set; }
         public string RPID { get; set; }
-        public int AGENTID { get; set; }
+        public string AGENTID { get; set; }
         public string OPID { get; set; }
         public int STATUS { get; set; }
         public string MSG { get; set; }
