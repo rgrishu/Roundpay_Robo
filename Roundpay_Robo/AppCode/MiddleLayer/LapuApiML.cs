@@ -87,7 +87,7 @@ namespace Roundpay_Robo.AppCode
                     ClassName = "LapuApiLogin",
                     Method = "Post"
                 };
-                SaveLapuReqRes(LapuApiReqResForDB);
+                await SaveLapuReqRes(LapuApiReqResForDB);
                 if (!string.IsNullOrEmpty(resp))
                 {
                     var lappuerrorcheck = JsonConvert.DeserializeObject<LapuError>(resp);
@@ -164,7 +164,7 @@ namespace Roundpay_Robo.AppCode
                 ClassName = "LapuApiLogin",
                 Method = "Post"
             };
-            SaveLapuReqRes(LapuApiReqResForDB2);
+            await SaveLapuReqRes(LapuApiReqResForDB2);
             if (!string.IsNullOrEmpty(profres))
             {
                 var lappuerror = JsonConvert.DeserializeObject<LapuError>(profres);
@@ -229,7 +229,7 @@ namespace Roundpay_Robo.AppCode
                 ClassName = "LapuLoginOtpValidate",
                 Method = "Post"
             };
-            SaveLapuReqRes(LapuApiReqResForDB2);
+            await SaveLapuReqRes(LapuApiReqResForDB2);
             if (!string.IsNullOrEmpty(otpres))
             {
                 var lappuerror = JsonConvert.DeserializeObject<LapuError>(otpres);
@@ -295,7 +295,7 @@ namespace Roundpay_Robo.AppCode
                     ClassName = "InitiateTransaction",
                     Method = "Post"
                 };
-                SaveLapuReqRes(LapuApiReqResForDB2);
+               await SaveLapuReqRes(LapuApiReqResForDB2);
             }
             catch(Exception ex)
             {
