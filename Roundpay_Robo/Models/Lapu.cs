@@ -152,7 +152,9 @@
 
     public class LapuReport
     {
+        public int Top { get; set; }
         public int LapuID { get; set; }
+        public int UserID { get; set; }
         public string TransactionID { get; set; }
         public string AccountNo { get; set; }
         public string OutletName { get; set; }
@@ -165,6 +167,7 @@
         public string LapuNo { get; set; }
         public string LiveID { get; set; }        
         public int Type { get; set; }
+        public int TID { get; set; }
         public string TransactionStatus { get; set; }
     }
     public class LapuServices : Lapu
@@ -173,6 +176,14 @@
         public int LapuTypeID { get; set; }
         public int SID { get; set; }
         public string Name { get; set; }
+    }
+    public class LapuReqRes: Lapu
+    {
+        public int LapuID { get; set; }
+        public int UserID { get; set; }
+        public string URL { get; set; }
+        public string Request { get; set; }
+        public string Response { get; set; }
     }
 
 

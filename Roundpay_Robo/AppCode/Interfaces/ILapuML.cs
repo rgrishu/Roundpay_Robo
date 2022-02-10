@@ -29,5 +29,6 @@ namespace Roundpay_Robo.AppCode.Interfaces
         Task<VendorMaster> SelectEditVendor(int ID, LoginResponse _lr);
         Task<List<Lapu>> GetVendorLapu(LoginResponse _lr);
         Task<List<LapuServices>> GetServices(LoginResponse _lr);
+        Task<LapuReqRes> GetReqRes(LapuReqRes data, LoginResponse _lr);
     }
 }

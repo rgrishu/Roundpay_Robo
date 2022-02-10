@@ -263,7 +263,7 @@ namespace Roundpay_Robo.AppCode
                                 if (tstatus.IsResend)
                                 {
 
-                                   // IsReLoginLapu Is Used For Relogin Lapu For Token 
+                                    // IsReLoginLapu Is Used For Relogin Lapu For Token 
                                     if (tstatus.IsReLoginLapu)
                                     {
                                         ILapuApiML _apiml = new LapuApiML(_accessor, _env, _dapper);
@@ -307,7 +307,7 @@ namespace Roundpay_Robo.AppCode
                                     //update transaction as Failed as success
                                     item.Type = tstatus.Status;
                                     item.LiveID = tstatus.OperatorID;
-                                    item.LapuBalance =string.IsNullOrEmpty(tstatus.Balance)?0:Convert.ToDecimal(tstatus.Balance);
+                                    item.LapuBalance = string.IsNullOrEmpty(tstatus.Balance) ? 0 : Convert.ToDecimal(tstatus.Balance);
                                     item.ErrorCode = tstatus.ErrorCode;
                                     item.Message = tstatus.ErrorMsg;
                                     Cres = await UpdateTransaction(item);
@@ -320,7 +320,7 @@ namespace Roundpay_Robo.AppCode
                     }
                     else
                     {
-                        response.STATUS =RechargeRespType.FAILED;
+                        response.STATUS = RechargeRespType.FAILED;
                         response.ERRORCODE = res.FirstOrDefault().ErrorCode;
                         response.MSG = res.FirstOrDefault().Msg;
                     }
@@ -378,7 +378,7 @@ namespace Roundpay_Robo.AppCode
                 res = await Task.FromResult(_dapper.Insert<Response>("proc_AddLapuDetial", dbparams, commandType: CommandType.StoredProcedure));
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 var _ = new ProcPageErrorLog(_dal).Call(new ErrorLog
                 {
@@ -417,16 +417,17 @@ namespace Roundpay_Robo.AppCode
         public async Task<List<LapuReport>> GetLapuReport(LapuReport Filter, LoginResponse _lr)
         {
             List<LapuReport> res = new List<LapuReport>();
-            try {
+            try
+            {
                 var dbparams = new DynamicParameters();
                 dbparams.Add("Type", Filter.Type, DbType.Int32);
-                dbparams.Add("AccountNo", Filter.AccountNo??"", DbType.String);
-                dbparams.Add("TransactionID", Filter.TransactionID??"", DbType.String);
-                dbparams.Add("LapuNo",string.IsNullOrEmpty(Filter.LapuNo)?"": Filter.LapuNo, DbType.String);
-                dbparams.Add("LapuNo",Filter.AccountNo??"", DbType.String);
-                dbparams.Add("LiveID", Filter.LiveID??"", DbType.String);
+                dbparams.Add("Top", Filter.Top, DbType.Int32);
+                dbparams.Add("AccountNo", string.IsNullOrEmpty(Filter.AccountNo) ? "": Filter.AccountNo, DbType.String);
+                dbparams.Add("TransactionID", Filter.TransactionID ?? "", DbType.String);
+                dbparams.Add("LapuNo", string.IsNullOrEmpty(Filter.LapuNo) ? "" : Filter.LapuNo, DbType.String);
+                dbparams.Add("LiveID", Filter.LiveID ?? "", DbType.String);
                 res = await Task.FromResult(_dapper.GetAll<LapuReport>("proc_SelectLapuRechargeReport", dbparams, commandType: CommandType.StoredProcedure));
-                
+
             }
             catch { }
             return res;
@@ -459,6 +460,14 @@ namespace Roundpay_Robo.AppCode
         {
             var dbparams = new DynamicParameters();
             var res = await Task.FromResult(_dapper.GetAll<LapuServices>("proc_selectLapuService", dbparams, commandType: CommandType.StoredProcedure));
+            return res;
+        }
+        public async Task<LapuReqRes> GetReqRes(LapuReqRes data, LoginResponse _lr)
+        {
+            var dbparams = new DynamicParameters();
+            dbparams.Add("LapuID", data.LapuID, DbType.Int32);
+            dbparams.Add("UserID", data.UserID, DbType.Int32);
+            var res = await Task.FromResult(_dapper.Get<LapuReqRes>("proc_GetLapuReqRes", dbparams, commandType: CommandType.StoredProcedure));
             return res;
         }
     }

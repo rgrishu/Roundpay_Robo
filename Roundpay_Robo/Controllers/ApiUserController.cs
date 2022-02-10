@@ -35,7 +35,7 @@ namespace Roundpay_Robo.Controllers
             if (_lr.RoleID == Role.APIUser && LoginType.ApplicationUser == _lr.LoginTypeID)
                 return View();
             return Ok();
-            
+
         }
         [Route("Report")]
         public IActionResult Report()
@@ -51,9 +51,18 @@ namespace Roundpay_Robo.Controllers
         [Route("GetLapuReport")]
         public IActionResult GetLapuRport(LapuReport Filter)
         {
-            ILapuML _lml = new LapuML(_accessor,_env,_dapper);
-            var res = _lml.GetLapuReport(Filter ,_lr).Result;
+            ILapuML _lml = new LapuML(_accessor, _env, _dapper);
+            var res = _lml.GetLapuReport(Filter, _lr).Result;
             return PartialView("PartialView/_LapuReport", res);
+        }
+
+        [HttpPost]
+        [Route("GetReqRes")]
+        public IActionResult GetReqRes(LapuReqRes data)
+        {
+            ILapuML _lml = new LapuML(_accessor, _env, _dapper);
+            var res = _lml.GetReqRes(data, _lr).Result;
+            return PartialView("PartialView/_RequestResponse", res);
         }
     }
 }
