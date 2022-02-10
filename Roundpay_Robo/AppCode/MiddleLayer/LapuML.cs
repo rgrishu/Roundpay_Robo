@@ -462,11 +462,11 @@ namespace Roundpay_Robo.AppCode
             var res = await Task.FromResult(_dapper.GetAll<LapuServices>("proc_selectLapuService", dbparams, commandType: CommandType.StoredProcedure));
             return res;
         }
-        public async Task<LapuReqRes> GetReqRes(LapuReqRes data, LoginResponse _lr)
+        public async Task<LapuReqRes> GetReqRes(int TID, int LapuID, LoginResponse _lr)
         {
             var dbparams = new DynamicParameters();
-            dbparams.Add("LapuID", data.LapuID, DbType.Int32);
-            dbparams.Add("UserID", data.UserID, DbType.Int32);
+            dbparams.Add("TID", TID, DbType.Int32);
+            dbparams.Add("LapuID", LapuID, DbType.Int32);
             var res = await Task.FromResult(_dapper.Get<LapuReqRes>("proc_GetLapuReqRes", dbparams, commandType: CommandType.StoredProcedure));
             return res;
         }
