@@ -136,6 +136,9 @@
         public string LapuRechargeNumber { get; set; }
         public bool IsExistAPIRequestID { get; set; }
         public decimal BalanceAmount { get; set; }
+        public int QMaxLength { get; set; }
+        public int QCurrentLength { get; set; }
+        public int LapuTranSleepTime { get; set; }
     }
     public class InitiateTransaction
     {
