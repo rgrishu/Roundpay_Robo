@@ -274,7 +274,7 @@ namespace Roundpay_Robo.AppCode
 
 
 
-        public async Task<string> InitiateTransaction(InitiateTransaction initiatetransaction, int UserID, int LapuID,int TID)
+        public async Task<string> InitiateTransaction(InitiateTransaction initiatetransaction, int UserID, int LapuID,int TID,int SleepTime)
         {
             var recres = string.Empty;
             try
@@ -282,6 +282,10 @@ namespace Roundpay_Robo.AppCode
                 initiatetransaction.token = appSetting.Token;
                 // string ULRRec = appSetting.URL + "Action/test";
                 string ULRRec = appSetting.URL + "Action/init_txn";
+                if (SleepTime >= 1000)
+                {
+                    Thread.Sleep(SleepTime);
+                }
                 recres = await AppWebRequest.O.PostJsonDataUsingHWRAsync(ULRRec, initiatetransaction).ConfigureAwait(false);
                 var dbparams = new DynamicParameters();
                 dbparams.Add("UserID", UserID, DbType.Int32);
