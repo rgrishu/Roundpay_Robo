@@ -6,9 +6,9 @@
     foreach (var item in Model)
     {
         i++;
-        <tr data-lapu-Id="@item.LapuID" data-user-Id="@item.UserID">
+        <tr data-lapu-Id="@item.LapuID" data-transaction-Id="@item.TID">
             <td>@i</td>
-            <td style="width: 225px;"><i onclick="RequestResponse()" class="fas fa-info-circle" style="cursor: pointer;"></i><span> @item.TransactionID</span></td>
+            <td style="width: 225px;"><i onclick="RequestResponse(@item.TID, @item.LapuID)" class="fas fa-info-circle" style="cursor: pointer;"></i><span> @item.TransactionID</span></td>
             <td>@item.AccountNo</td>
             <td>@item.OutletName</td>
             <td>@item.Provider</td>
@@ -47,30 +47,27 @@ else
 
 
 <script>
-    //function RequestResponse(){
-    //    debugger;
-    //    var data ={ 
-    //        LapuID: a.closest('tr').data().lapuId,
-    //        UserID: a.closest('tr').data().userId
-    //    }
-
-    //    $.post("GetReqRes", data).done(function(result){
-    //        debugger;
-    //        if(typeof result == 'object'){
-    //            resultReload(result);
-    //        }
-    //        else{
-    //            mdlA.id = 'mymodel1';
-    //            mdlA.content = result;
-    //            mdlA.options.backdrop = 'static';
-    //            mdlA.alert(mdlA.size.default);
-    //            $('button.close span,#mdlCancel').unbind().click(function () {
-    //                mdlA.dispose();
-    //            });
-    //        }
-    //        console.log(result);
-    //    }).fail(function(xhr){        
-    //        alert("Failed");
-    //    });
-    //}
+    function RequestResponse(TID, LapuID){
+        preloader.load();
+        debugger;
+        $.post(`GetReqRes/${TID}/${LapuID}`).done(function(result){ 
+            preloader.remove();
+            if(typeof result == 'object'){
+                resultReload(result);
+            }
+            else{                
+                mdlA.id = 'mymodel1';
+                mdlA.content = result;
+                mdlA.options.backdrop = 'static';
+                mdlA.alert(mdlA.size.xlarge);
+                $('button.close span,#mdlCancel').unbind().click(function () {
+                    mdlA.dispose();
+                });
+            }
+        }).fail(function(xhr){        
+            an.title = "Oops !";
+            an.content = "Server Error";
+            an.alert(an.type.failed);
+        });
+    }
 </script>

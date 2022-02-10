@@ -4148,3 +4148,7 @@ label {
         border-bottom: 2px solid #dee2e6;
         border-top: 2px solid #dee2e6;
     }
+.table-responsive {
+   
+    height: 353px!important;
+}

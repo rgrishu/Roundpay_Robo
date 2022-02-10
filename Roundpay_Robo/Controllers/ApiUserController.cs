@@ -44,7 +44,6 @@ namespace Roundpay_Robo.Controllers
             {
                 return RedirectToAction("Index", "Login");
             }
-
             return View();
         }
         [HttpPost]
@@ -57,11 +56,11 @@ namespace Roundpay_Robo.Controllers
         }
 
         [HttpPost]
-        [Route("GetReqRes")]
-        public IActionResult GetReqRes(LapuReqRes data)
+        [Route("GetReqRes/{TID}/{LapuID}")]
+        public IActionResult GetReqRes(int TID, int LapuID)
         {
             ILapuML _lml = new LapuML(_accessor, _env, _dapper);
-            var res = _lml.GetReqRes(data, _lr).Result;
+            var res = _lml.GetReqRes(TID, LapuID, _lr).Result;
             return PartialView("PartialView/_RequestResponse", res);
         }
     }
