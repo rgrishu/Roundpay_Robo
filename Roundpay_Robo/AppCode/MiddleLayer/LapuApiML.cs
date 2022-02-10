@@ -11,7 +11,7 @@ using Roundpay_Robo.AppCode.WebRequest;
 using Roundpay_Robo.Models;
 using Roundpay_Robo.Services;
 using System.Data;
-
+using System.Threading;
 namespace Roundpay_Robo.AppCode
 {
     public class LapuApiML : ILapuApiML
@@ -25,6 +25,9 @@ namespace Roundpay_Robo.AppCode
         private readonly IConnectionConfiguration _c;
         private readonly IDAL _dal;
         #endregion
+
+
+
         public LapuApiML(IHttpContextAccessor accessor, Microsoft.AspNetCore.Hosting.IHostingEnvironment env, IDapper dapper)
         {
             _accessor = accessor;
@@ -277,15 +280,15 @@ namespace Roundpay_Robo.AppCode
         public async Task<string> InitiateTransaction(InitiateTransaction initiatetransaction, int UserID, int LapuID,int TID,int SleepTime)
         {
             var recres = string.Empty;
+
+
+
             try
             {
                 initiatetransaction.token = appSetting.Token;
                 // string ULRRec = appSetting.URL + "Action/test";
                 string ULRRec = appSetting.URL + "Action/init_txn";
-                if (SleepTime >= 1000)
-                {
-                    Thread.Sleep(SleepTime);
-                }
+                System.Threading.Thread.Sleep(SleepTime);    
                 recres = await AppWebRequest.O.PostJsonDataUsingHWRAsync(ULRRec, initiatetransaction).ConfigureAwait(false);
                 var dbparams = new DynamicParameters();
                 dbparams.Add("UserID", UserID, DbType.Int32);
