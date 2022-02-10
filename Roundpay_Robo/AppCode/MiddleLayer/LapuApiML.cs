@@ -288,6 +288,7 @@ namespace Roundpay_Robo.AppCode
                 initiatetransaction.token = appSetting.Token;
                 // string ULRRec = appSetting.URL + "Action/test";
                 string ULRRec = appSetting.URL + "Action/init_txn";
+                
                 System.Threading.Thread.Sleep(SleepTime);    
                 recres = await AppWebRequest.O.PostJsonDataUsingHWRAsync(ULRRec, initiatetransaction).ConfigureAwait(false);
                 var dbparams = new DynamicParameters();

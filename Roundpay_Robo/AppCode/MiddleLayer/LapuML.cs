@@ -183,6 +183,8 @@ namespace Roundpay_Robo.AppCode
             #endregion
             try
             {
+                DateTimeOffset now = DateTimeOffset.UtcNow;
+                long unixTimeMilliseconds = now.ToUnixTimeMilliseconds();
                 var dbparams = new DynamicParameters();
                 dbparams.Add("UserID", _req.UserID, DbType.String);
                 dbparams.Add("Token", _req.Token, DbType.String);
@@ -191,6 +193,7 @@ namespace Roundpay_Robo.AppCode
                 dbparams.Add("Account", _req.Account, DbType.String);
                 dbparams.Add("Amount", _req.Amount, DbType.String);
                 dbparams.Add("APIRequestID", _req.APIRequestID, DbType.String);
+                dbparams.Add("UnixDatTime", unixTimeMilliseconds, DbType.String);
                 // var res = await Task.FromResult(_dapper.GetMultiple<LapuTransaction>("proc_LapuRechargeTransaction", dbparams, commandType: CommandType.StoredProcedure));
                 var result = _dapper.GetMultiple<LapuTransaction, APIDetail>("[proc_LapuRechargeTransaction]", dbparams, commandType: CommandType.StoredProcedure).Result;
                 var res = (List<LapuTransaction>)result.GetType().GetProperty("Table1").GetValue(result, null);
