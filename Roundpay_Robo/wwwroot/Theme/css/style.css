@@ -4152,3 +4152,14 @@ label {
    
     height: 353px!important;
 }
+textarea.form-control {
+    height: inherit!important;
+}
+.cus-btn 
+{
+    font-size: 10px!important;
+}
+.cus-textarea {
+    width: 108px;
+    height: 38px;
+}

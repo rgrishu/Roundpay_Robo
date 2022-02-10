@@ -56,18 +56,19 @@
                                 <thead class="bg-tableth">
                                     <tr>
                                         <th>#</th>
-                                        <th>Transaction ID</th>
-                                        <th>Account No</th>
-                                        <th>Outlet Name</th>
+                                        @*<th>Transaction ID</th>*@
+                                        <th>Acc No</th>
+                                        <th>Name</th>
                                         <th>Provider</th>
                                         <th>Entry Date</th>
                                         <th>Modify Date</th>
-                                        <th>Lapu Opening</th>
-                                        <th>Recharge Amount</th>
-                                        <th>Lapu Closing</th>
+                                        <th>Opening</th>
+                                        <th>Amount</th>
+                                        <th>Closing</th>
                                         <th>Lapu No</th>
                                         <th>Live ID</th>
                                         <th>Status</th>
+                                        <th>Action</th>
                                         @*<th scope="col">Action</th>*@
                                     </tr>
                                 </thead>
@@ -90,7 +91,8 @@
         $("#AccountNo").tooltip();
         $("#TransactionID").tooltip();
         $("#Liveid").tooltip();
-    });
+        getdata();
+    });    
     //function LoadLapuReport(){
     //$.get("GetLapuReport").done(function(result){
     //    $("tbody").html(result);
