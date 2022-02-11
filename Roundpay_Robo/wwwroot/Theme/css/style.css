@@ -1804,6 +1804,10 @@ th {
     padding: 5px 6px;
     vertical-align: middle
 }
+.cus-td {
+    padding: 4px 9px !important;
+    width: 150px;
+}
 
 .table-hover tbody tr:hover, .table-striped tbody tr:nth-of-type(odd), .thead-default th {
     background-color: #f8f9fa
