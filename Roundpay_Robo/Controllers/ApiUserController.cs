@@ -66,6 +66,20 @@ namespace Roundpay_Robo.Controllers
             return PartialView("PartialView/_RequestResponse", res);
         }
         [HttpPost]
+        [Route("UpdateTransactionStatus")]
+        public async Task<IActionResult> LapuRechargeUpdate(LapuTransaction ltr)
+        {
+            if (loginML.IsInValidSession())
+            {
+                return RedirectToAction("Index", "Login");
+            }
+            ILapuML _lml = new LapuML(_accessor, _env, _dapper);
+            ltr.UserID = _lr.UserID;
+            var res = _lml.UpdateTransaction(ltr).Result;
+            return Json(res);
+        }
+        }
+        [HttpPost]
         [Route("LapuTransactioData")]
         public IActionResult LapuTransactioData(LapuApiTransacrionReq lapuapitransacrionreq,int lapuid)
         {
