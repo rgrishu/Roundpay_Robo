@@ -62,6 +62,6 @@ namespace Roundpay_Robo.Controllers
             ILapuML _lml = new LapuML(_accessor, _env, _dapper);
             var res = _lml.GetReqRes(TID, LapuID, _lr).Result;
             return PartialView("PartialView/_RequestResponse", res);
-        }
+        }        
     }
 }
