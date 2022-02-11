@@ -210,28 +210,42 @@ namespace Roundpay_Robo.AppCode
             return response;
         }
 
-        public async Task<Response> LapuTransactioDataFromApi(LapuApiTransacrionReq lapuapitransacrionreq,int UserID,int LapuID)
+        public async Task<LapuApiTransactionRecord> LapuTransactioDataFromApi(LapuApiTransacrionReq lapuapitransacrionreq,int UserID,int LapuID)
         {
-            var response = new Response()
+            LapuApiTransactionRecord response = new LapuApiTransactionRecord();
+            try
             {
-                StatusCode = ErrorCodes.Minus1,
-                Msg = ErrorCodes.FAILED
-            };
-            lapuapitransacrionreq.token = appSetting.Token;
-
-            string ULRProfile = appSetting.URL + "Fetch/get_txn_data";
-            var tranres = await AppWebRequest.O.PostJsonDataUsingHWRAsync(ULRProfile, lapuapitransacrionreq).ConfigureAwait(false);
-            var LapuApiReqResForDB2 = new LapuApiReqResForDB()
+                lapuapitransacrionreq.token = appSetting.Token;
+                string ULRProfile = appSetting.URL + "Fetch/get_txn_data";
+                var tranres = await AppWebRequest.O.PostJsonDataUsingHWRAsync(ULRProfile, lapuapitransacrionreq).ConfigureAwait(false);
+                var LapuApiReqResForDB2 = new LapuApiReqResForDB()
+                {
+                    UserID = UserID,
+                    LapuID = LapuID,
+                    URL = ULRProfile,
+                    Request = Newtonsoft.Json.JsonConvert.SerializeObject(lapuapitransacrionreq),
+                    Response = tranres,
+                    ClassName = "LapuApiML",
+                    Method = "Post"
+                };
+                await SaveLapuReqRes(LapuApiReqResForDB2);
+                if (!string.IsNullOrEmpty(tranres))
+                {
+                    response = JsonConvert.DeserializeObject<LapuApiTransactionRecord>(tranres);
+                }
+            }
+            catch (Exception ex)
             {
-                UserID = UserID,
-                LapuID = LapuID,
-                URL = ULRProfile,
-                Request = Newtonsoft.Json.JsonConvert.SerializeObject(lapuapitransacrionreq),
-                Response = tranres,
-                ClassName = "LapuApiML",
-                Method = "Post"
-            };
-            await SaveLapuReqRes(LapuApiReqResForDB2);
+                ErrorLog errorLog = new ErrorLog
+                {
+                    ClassName = "LapuAPIML.cs",
+                    FuncName = "InitiateTransaction",
+                    Error = ex.Message,
+                    LoginTypeID = 1,
+                    UserId = UserID
+                };
+                var _ = new ProcPageErrorLog(_dal).Call(errorLog);
+            }
             return response;
         }
 
@@ -303,9 +317,6 @@ namespace Roundpay_Robo.AppCode
         public async Task<string> InitiateTransaction(InitiateTransaction initiatetransaction, int UserID, int LapuID,int TID,int SleepTime)
         {
             var recres = string.Empty;
-
-
-
             try
             {
                 initiatetransaction.token = appSetting.Token;

@@ -79,7 +79,52 @@
         public string appVersion { get; set; }
         public string voltTxnId { get; set; }
         public decimal balAfterTxn { get; set; }
+        public TxnRecords txnRecords { get; set; }
+
     }
+        public class TxnRecord
+    {
+        public string txnType { get; set; }
+        public string voltTxnId { get; set; }
+        public string ampTxnId { get; set; }
+        public string txnState { get; set; }
+        public string batchState { get; set; }
+        public string txnDateTime { get; set; }
+        public string customerId { get; set; }
+        public string retailerId { get; set; }
+        public string txnAmount { get; set; }
+        public string mode { get; set; }
+        public string txnCharge { get; set; }
+        public string userMessage { get; set; }
+        public string ifscCode { get; set; }
+        public string beneName { get; set; }
+        public string beneAccNo { get; set; }
+        public string beneMobile { get; set; }
+        public string rrn { get; set; }
+        public string senderName { get; set; }
+        public string bankName { get; set; }
+        public string voltRefTxnId { get; set; }
+        public string customerNumber { get; set; }
+        public string txn_info { get; set; }
+        public string agentTxnId { get; set; }
+        public string operatorId { get; set; }
+        public string channelId { get; set; }
+    }
+
+    public class LapuApiTransactionRecord
+    {
+        public string Resp_code { get; set; }
+        public string Resp_desc { get; set; }
+        public Data data { get; set; }
+    }
+
+    public class TxnRecords
+    {
+        public List<TxnRecord> txnRecord { get; set; }
+    }
+
+
+
 
     public class LapuLoginResponse
     {
@@ -162,8 +207,8 @@
         public string AccountNo { get; set; }
         public string OutletName { get; set; }
         public string Provider { get; set; }
-        public DateTime EntryDate { get; set; }
-        public DateTime ModifyDate { get; set; }
+        public string EntryDate { get; set; }
+        public string ModifyDate { get; set; }
         public string LapuOpening { get; set; }
         public decimal RechargeAmount { get; set; }
         public string LapuClosing { get; set; }
@@ -172,6 +217,7 @@
         public int Type { get; set; }
         public int TID { get; set; }
         public string TransactionStatus { get; set; }
+        public string ProviderTokenID { get; set; }
     }
     public class LapuServices : Lapu
     {

@@ -1,0 +1,65 @@
+﻿@using Roundpay_Robo.AppCode.StaticModel
+@using Roundpay_Robo.Models
+@model LapuApiTransactionRecord
+<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+</button>
+<table class="table table-bordered table-striped table-responsive-sm" id="tbltrd">
+    <thead class="bg-tableth">
+        <tr>
+            <th>#</th>
+            <th>Account</th>
+            <th>Amount </th>
+            <th>Status</th>
+            <th>VoltTxnId</th>
+            <th>LiveID</th>
+            <th>Transaction Date</th>
+        </tr>
+    </thead>
+
+    @if (Model.data != null)
+    {
+        if (Model.data.errorCode == LapuFailCode.SessionExpired)
+        {
+            <tr>
+                <td colspan="7">@Model.data.messageText</td>
+            </tr>
+        }
+        else
+        {
+            int i = 0;
+            @if (Model.data.txnRecords.txnRecord.Count() > 0)
+            {
+                @foreach (var item in Model.data.txnRecords.txnRecord)
+                {
+                    i++;
+                    <tr>
+                        <td>@i</td>
+                        <td>@item.customerId</td>
+                        <td>@item.txnAmount</td>
+                        <td>@item.batchState</td>
+                        <td>@item.voltTxnId</td>
+                        <td>@item.rrn</td>
+                        <td>@item.txnDateTime</td>
+                    </tr>
+
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="7">Records Not Found.</td>
+
+                </tr>
+            }
+        }
+    }
+    else
+    {
+        <tr>
+            <td colspan="7">Records Not Found.</td>
+        </tr>
+
+    }
+
+</table>

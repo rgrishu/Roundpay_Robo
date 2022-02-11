@@ -138,25 +138,5 @@ namespace Roundpay_Robo.Controllers
         //    var res = _lml.GetVendorLapu(_lr).Result;
         //    return PartialView("PartialView/_AddLapu", res);
         //}
-
-
-        [HttpPost]
-        [Route("LapuTransactioData")]
-        public IActionResult LapuTransactioData()
-        {
-            if (loginML.IsInValidSession())
-            {
-                return RedirectToAction("Index", "Login");
-            }
-            ILapuML _lml = new LapuML(_accessor, _env, _dapper);
-           // var res = _lml.LapuBalance(lapuloginreq, _lr, lapuid).Result;
-
-
-
-
-            return Ok();
-            
-           
-        }
     }
 }

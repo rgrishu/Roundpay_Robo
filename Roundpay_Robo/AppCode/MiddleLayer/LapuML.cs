@@ -80,10 +80,11 @@ namespace Roundpay_Robo.AppCode
             var res = await apiml.LapuLoginOtpValidate(lapuotp, _lr, LapuID);
             return res;
         }
-        public async Task<Response> LapuTransactioDataFromAPi(LapuLoginRequest lapulogireq, LoginResponse _lr, int LapuID)
+        public async Task<LapuApiTransactionRecord> LapuTransactioDataFromAPi(LapuApiTransacrionReq lapuapitransacrionreq,int UserID, int LapuID)
         {
             ILapuApiML apiml = new LapuApiML(_accessor, _env, _dapper);
-            var res = await apiml.LapuApiBalance(lapulogireq, _lr, LapuID);
+      
+            var res = await apiml.LapuTransactioDataFromApi(lapuapitransacrionreq, UserID, LapuID);
             return res;
         }
         //for Api Use

@@ -6,6 +6,7 @@ using Roundpay_Robo.AppCode.Model;
 using Roundpay_Robo.AppCode.StaticModel;
 using Roundpay_Robo.Models;
 using Roundpay_Robo.Services;
+using System.Globalization;
 
 namespace Roundpay_Robo.Controllers
 {
@@ -50,6 +51,7 @@ namespace Roundpay_Robo.Controllers
         [Route("GetLapuReport")]
         public IActionResult GetLapuRport(LapuReport Filter)
         {
+          
             ILapuML _lml = new LapuML(_accessor, _env, _dapper);
             var res = _lml.GetLapuReport(Filter, _lr).Result;
             return PartialView("PartialView/_LapuReport", res);
@@ -62,6 +64,27 @@ namespace Roundpay_Robo.Controllers
             ILapuML _lml = new LapuML(_accessor, _env, _dapper);
             var res = _lml.GetReqRes(TID, LapuID, _lr).Result;
             return PartialView("PartialView/_RequestResponse", res);
-        }        
+        }
+        [HttpPost]
+        [Route("LapuTransactioData")]
+        public IActionResult LapuTransactioData(LapuApiTransacrionReq lapuapitransacrionreq,int lapuid)
+        {
+            if (loginML.IsInValidSession())
+            {
+                return RedirectToAction("Index", "Login");
+            }
+            ILapuML _lml = new LapuML(_accessor, _env, _dapper);
+                var startdate = lapuapitransacrionreq.startDate.Trim().Substring(0, 11);
+                DateTime dt;
+                var dates = DateTime.TryParseExact(startdate,"dd MMM yyyy",CultureInfo.InvariantCulture,DateTimeStyles.None,out dt);
+                lapuapitransacrionreq.minRecord = "0";
+                lapuapitransacrionreq.maxRecord = "50";
+                lapuapitransacrionreq.startDate = dt.ToString("dd-MMM-yy"); ;
+                lapuapitransacrionreq.endDate = dt.AddDays(1).ToString("dd-MMM-yy");
+                var res = _lml.LapuTransactioDataFromAPi(lapuapitransacrionreq, _lr.UserID, lapuid).Result;
+               return PartialView("PartialView/_LapuTransactionRecord",res);
+        }
+
+
     }
 }
