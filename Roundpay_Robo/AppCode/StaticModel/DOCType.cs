@@ -44,6 +44,10 @@ namespace Roundpay_Robo.AppCode.StaticModel
         public static string EmployeeGiftImgPath = Path.Combine(Directory.GetCurrentDirectory(), "Image/Employee/GiftImage/");
         public static string GIBLCertificatePath = Path.Combine(Directory.GetCurrentDirectory(), "Image/GIBL/GIBL_Public_Key.pem");
 
+        public const string TimeDiffPAthName = "timediff.json";
+        public static string TimeDiffPAth = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\TimeDiff", TimeDiffPAthName);
+
+
         public const string LogoSuffix = "Image/Website/{0}/logo.png";
         public const string PopupSuffix = "Image/Website/{0}/Popup";
         public const string BannerSiteSuffix = "Image/Website/{0}/BannerSite";

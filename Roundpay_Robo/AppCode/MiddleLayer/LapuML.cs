@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Newtonsoft.Json;
 using Roundpay_Robo.AppCode.Configuration;
 using Roundpay_Robo.AppCode.DB;
 using Roundpay_Robo.AppCode.DL;
@@ -79,7 +80,12 @@ namespace Roundpay_Robo.AppCode
             var res = await apiml.LapuLoginOtpValidate(lapuotp, _lr, LapuID);
             return res;
         }
-
+        public async Task<Response> LapuTransactioDataFromAPi(LapuLoginRequest lapulogireq, LoginResponse _lr, int LapuID)
+        {
+            ILapuApiML apiml = new LapuApiML(_accessor, _env, _dapper);
+            var res = await apiml.LapuApiBalance(lapulogireq, _lr, LapuID);
+            return res;
+        }
         //for Api Use
         public async Task<LapuRechargeResponse> LappuApiRecharge(LapuRechargeRequest lapurecreq)
         {
@@ -246,6 +252,16 @@ namespace Roundpay_Robo.AppCode
                             rechargeAPIHit.LoginID = validateReq.LoginID;
                             rechargeAPIHit.IsException = false;
 
+                            var stratdate = DateTime.Now;
+
+                            if (item.LapuTranSleepTime > 0)
+                            {
+                                System.Threading.Thread.Sleep(item.LapuTranSleepTime);
+                            }
+                            var EndDate = DateTime.Now;
+
+                            CheckTimeSesion(item.TID, item.LapuTranSleepTime, stratdate, EndDate);
+
                             var tstatus = doTransaction(req, item.UserID, item.LapuID, item.TID, item.LapuTranSleepTime);
 
                             TransactionStatus doTransaction(InitiateTransaction req, int UserID, int LapuID,int  TID, int SleepTime)
@@ -345,6 +361,48 @@ namespace Roundpay_Robo.AppCode
 
             return response;
         }
+
+
+        public class TestTimeDiff
+        {
+            public int TID { get; set; }
+            public int ProcessTime { get; set; }
+            public DateTime StartDate { get; set; }
+            public DateTime  EndDate { get; set; }
+        }
+
+        public static bool CheckTimeSesion(int TID, int  ProcessTime, DateTime StartDate, DateTime EndDate)
+        {
+            try
+            {
+                var jsonFile = DOCType.TimeDiffPAth;
+                if (File.Exists(jsonFile))
+                {
+                    var json = System.IO.File.ReadAllText(jsonFile);
+                    var jObjectList = JsonConvert.DeserializeObject<List<TestTimeDiff>>(json);
+                    jObjectList = jObjectList == null ? new List<TestTimeDiff>() : jObjectList;
+                    jObjectList.Add(new TestTimeDiff
+                    {
+                        TID = TID,
+                        ProcessTime = ProcessTime,
+                        StartDate = StartDate,
+                        EndDate = EndDate
+                    });
+
+                    string output = JsonConvert.SerializeObject(jObjectList, Formatting.Indented);
+                    File.WriteAllText(jsonFile, output);
+                }
+                return true;
+            }
+
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+
+
 
         public async Task<Response> UpdateTransaction(LapuTransaction ltr)
         {

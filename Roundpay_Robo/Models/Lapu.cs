@@ -195,4 +195,18 @@
         public List<Lapu> listLAPU { get; set; }
         public List<LapuServices> listLapuServices { get; set; }
     }
+
+    public class LapuApiTransacrionReq
+    {
+        public string token { get; set; }
+        public string access_token { get; set; }
+        public string minRecord { get; set; }
+        public string maxRecord { get; set; }
+        public string customerId { get; set; }
+        public string endDate { get; set; }
+        public string startDate { get; set; }
+        public string txnType { get; set; }
+        public string txnStatus { get; set; }
+    }
+
 }
