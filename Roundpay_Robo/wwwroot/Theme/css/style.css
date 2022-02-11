@@ -2492,7 +2492,7 @@ body {
                     display: inline-block;
                     font-size: 18px;
                     line-height: 25px;
-                    margin-left: 3px;
+                    margin-left: 25px;
                     margin-right: 10px;
                     text-align: center;
                     vertical-align: middle;
@@ -2938,7 +2938,7 @@ body {
 }
 
 .header-title {
-    margin-bottom: 8px;
+   /* margin-bottom: 8px;*/
     text-transform: uppercase;
     letter-spacing: .02em;
     font-size: 14px
@@ -4153,8 +4153,7 @@ label {
         border-top: 2px solid #dee2e6;
     }
 .table-responsive {
-   
-    height: 353px!important;
+    height: 378px !important;
 }
 textarea.form-control {
     height: inherit!important;
@@ -4167,3 +4166,40 @@ textarea.form-control {
     width: 108px;
     height: 38px;
 }
+
+* {
+    box-sizing: border-box;
+}
+
+.column {
+    /* box toward left of the window screen */
+    float: left;
+    width: 24%;
+    padding: 22px;
+}
+
+.row {
+    /* Specify the margin for the row class */
+    margin: 3px;
+}
+
+/* Style the class named block */
+.block {
+    padding: 10px;
+    text-align: center;
+    background-color: #fff;
+    color: #242c6d;
+    box-shadow: 1px 1px 12px -3px;
+}
+
+    /* Provide styling for when mouse will move over the counter*/
+    .block:hover {
+        transform: scale(1.1);
+        background-color: #242c6d;
+        transition-duration: 1s;
+        color: #ffffff;
+    }
+
+.fa {
+    font-size: 50px;
+}  

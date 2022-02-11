@@ -162,8 +162,8 @@
         public string AccountNo { get; set; }
         public string OutletName { get; set; }
         public string Provider { get; set; }
-        public DateTime EntryDate { get; set; }
-        public DateTime ModifyDate { get; set; }
+        public string EntryDate { get; set; }
+        public string ModifyDate { get; set; }
         public string LapuOpening { get; set; }
         public decimal RechargeAmount { get; set; }
         public string LapuClosing { get; set; }

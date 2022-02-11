@@ -7,11 +7,11 @@
                     <div class="card-header bg-primary text-light">
                         <div class="header-title">
                             <div class="row">
-                                <div class="col-sm-12 h6">
+                               @* <div class="col-sm-12 h6">
                                     <i class="mdi mdi-book-open-page-variant"></i> Lapu Recharge Report
-                                </div>
+                                </div>*@
                                 <div class="col-sm-2">
-                                    <select title="Top" class="form-control" id="ddlTop">                                        
+                                    <select title="Top" class="form-control" id="ddlTop">
                                         <option value="50">50</option>
                                         <option value="100">100</option>
                                         <option value="200">200</option>
@@ -41,8 +41,8 @@
                                     <div class="input-group">
                                         <input title="Live ID" type="text" class="form-control" placeholder="Live ID" id="Liveid">
                                         <div class="input-group-append">
-                                            <button class="btn btn-sm btn-light" type="button" id="FilterLapuReport" onclick = "filterLapuReport()">
-                                                <i class="fa fa-search"></i>
+                                            <button class="btn btn-sm btn-light" type="button" id="FilterLapuReport" onclick="filterLapuReport()">
+                                                <i class="fa fa-search" style="    font-size: 22px;"></i>
                                             </button>
                                         </div>
                                     </div>
@@ -84,15 +84,14 @@
 @section scripts{
 <script>
     $(document).ready(function(){
-       filterLapuReport();
+        filterLapuReport();
         $("#ddlTop").tooltip();
         $("#ddlStatus").tooltip();
         $("#LapuNo").tooltip();
         $("#AccountNo").tooltip();
         $("#TransactionID").tooltip();
-        $("#Liveid").tooltip();
-        getdata();
-    });    
+        $("#Liveid").tooltip();        
+    });
     //function LoadLapuReport(){
     //$.get("GetLapuReport").done(function(result){
     //    $("tbody").html(result);
