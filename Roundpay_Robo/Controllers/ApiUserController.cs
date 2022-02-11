@@ -78,7 +78,7 @@ namespace Roundpay_Robo.Controllers
             var res = _lml.UpdateTransaction(ltr).Result;
             return Json(res);
         }
-        }
+        
         [HttpPost]
         [Route("LapuTransactioData")]
         public IActionResult LapuTransactioData(LapuApiTransacrionReq lapuapitransacrionreq,int lapuid)
