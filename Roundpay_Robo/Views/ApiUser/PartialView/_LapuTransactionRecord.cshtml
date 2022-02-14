@@ -28,7 +28,7 @@
         else
         {
             int i = 0;
-            @if (Model.data.txnRecords.txnRecord.Count() > 0)
+            @if (Model.data.txnRecords!=null && Model.data.txnRecords.txnRecord.Count() > 0)
             {
                 @foreach (var item in Model.data.txnRecords.txnRecord)
                 {
