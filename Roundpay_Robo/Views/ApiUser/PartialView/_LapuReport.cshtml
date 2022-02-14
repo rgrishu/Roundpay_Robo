@@ -3,7 +3,7 @@
 @if (Model.Any())
 {
     int i = 0;
-   
+
     foreach (var item in Model)
     {
         i++;
@@ -23,23 +23,23 @@
             <td>
                 @if (@item.Type == 1)
                 {
-                   <a onclick="RequestResponse(@item.TID, @item.LapuID)"> <h6><span class="badge badge-warning text-light">Pending</span></h6></a>
+                    <a onclick="RequestResponse(@item.TID, @item.LapuID)"> <h6><span class="badge badge-warning text-light">Pending</span></h6></a>
                 }
                 @if (@item.Type == 2)
                 {
-                   <a onclick="RequestResponse(@item.TID, @item.LapuID)">  <h6><span class="badge badge-success text-light">Success</span></h6></a>
+                    <a onclick="RequestResponse(@item.TID, @item.LapuID)">  <h6><span class="badge badge-success text-light">Success</span></h6></a>
                 }
                 @if (@item.Type == 3)
                 {
-                   <a onclick="RequestResponse(@item.TID, @item.LapuID)">  <h6><span class="badge badge-danger text-light">Failed</span></h6></a>
+                    <a onclick="RequestResponse(@item.TID, @item.LapuID)">  <h6><span class="badge badge-danger text-light">Failed</span></h6></a>
                 }
             </td>
             <td class="cus-td">
                 @if (@item.Type == 1)
                 {
                     <textarea class="cus-textarea"></textarea>
-                    <a class="cus-btn btn btn-sm btn-success text-light" data-id="2" onclick="SuccessFail(this)">Success</a>
-                    <a class="cus-btn btn btn-sm btn-danger text-light" data-id="3" onclick="SuccessFail(this)">Failed</a>
+                    <a class="cus-btn btn btn-sm btn-success text-light" data-id-s="2" onclick="SuccessFail(this)">Success</a>
+                    <a class="cus-btn btn btn-sm btn-danger text-light" data-id-s="3" onclick="SuccessFail(this)">Failed</a>
                 }
             </td>
             @*<td class="text-nowrap"> <a class="btn btn-sm btn-danger text-light" onclick="btnDelete()"><i class="fas fa-trash"></i></a>
@@ -99,22 +99,30 @@ else
     }
 
     function SuccessFail(__this){
-        
+
         preloader.load();
         var a = $(__this).closest('tr')
         var ltr = {
             TID : a.data().tId,
-            Type : a.attr("data-id"),
+            Type : $(__this).attr("data-id-s"),
             LiveID : $(".cus-textarea").val(),
             LapuCurrentAmt : 0,
             LapuID : a.data().lapuId
         }
+        console.log(ltr);
         $.post("UpdateTransactionStatus", ltr).done(function(result){
-            filterLapuReport();
             preloader.remove();
-            an.title = "Done!";
-            an.content = "Transaction Marked Sucess";
-            an.alert(an.type.success);
+             if (result.statusCode == -1) {
+                    an.title = "Oops";
+                    an.content = result.msg;
+                    an.alert(-1);
+                }
+                else if (result.statusCode == 1) {
+                    an.title = "Done";
+                    an.content = result.msg;
+                    an.alert(1);
+                }
+                  filterLapuReport();
         }).fail(function(xhr){
             preloader.remove();
             an.title = "Oops!";
@@ -135,7 +143,7 @@ else
     //    }
     //    $.post("UpdateTransactionStatus", ltr).done(function(result){
     //        filterLapuReport();
-    //        preloader.remove();            
+    //        preloader.remove();
     //        an.title = "Done!";
     //        an.content = "Transaction Marked Failed";
     //        an.alert(an.type.success);

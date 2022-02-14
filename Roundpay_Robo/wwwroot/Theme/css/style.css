@@ -1801,8 +1801,8 @@ th {
 }
 
 .table > tbody > tr > td, .table > tfoot > tr > td, .table > thead > tr > td {
-    padding: 5px 6px;
-    vertical-align: middle
+    padding: 2px 5px;
+    vertical-align: middle;
 }
 .cus-td {
     padding: 4px 9px !important;
@@ -2271,7 +2271,7 @@ body {
 }
 
 .wrapper {
-    padding-top: 120px
+    padding-top: 108px;
 }
 
 .page-title-box {
@@ -2934,7 +2934,7 @@ body {
     left: 0 !important;
     font-family: "Work Sans",sans-serif;
     font-size: inherit;
-    padding: 20px 0
+    padding: 4px 0;
 }
 
 .header-title {
@@ -4153,7 +4153,9 @@ label {
         border-top: 2px solid #dee2e6;
     }
 .table-responsive {
-    height: 378px !important;
+    height: calc(100vh - 208px);
+    position: relative;
+    bottom: 6px;
 }
 textarea.form-control {
     height: inherit!important;
@@ -4201,5 +4203,24 @@ textarea.form-control {
     }
 
 .fa {
-    font-size: 50px;
-}  
+    font-size: 15px;
+}
+.card-header {
+    padding: 0.1rem 0rem!important;
+   
+ 
+}
+.bg-tableth {
+    position: sticky;
+    top: -2px;
+    background: #fff;
+
+}
+.form-control {
+    height: calc(1.8rem + 2px) !important;
+    padding: 0.4rem 0.75rem !important;
+}
+.fa-search 
+{
+    font-size: 13px!important;
+}
