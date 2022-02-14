@@ -80,10 +80,10 @@ namespace Roundpay_Robo.AppCode
             var res = await apiml.LapuLoginOtpValidate(lapuotp, _lr, LapuID);
             return res;
         }
-        public async Task<LapuApiTransactionRecord> LapuTransactioDataFromAPi(LapuApiTransacrionReq lapuapitransacrionreq,int UserID, int LapuID)
+        public async Task<LapuApiTransactionRecord> LapuTransactioDataFromAPi(LapuApiTransacrionReq lapuapitransacrionreq, int UserID, int LapuID)
         {
             ILapuApiML apiml = new LapuApiML(_accessor, _env, _dapper);
-      
+
             var res = await apiml.LapuTransactioDataFromApi(lapuapitransacrionreq, UserID, LapuID);
             return res;
         }
@@ -265,7 +265,7 @@ namespace Roundpay_Robo.AppCode
 
                             var tstatus = doTransaction(req, item.UserID, item.LapuID, item.TID, item.LapuTranSleepTime);
 
-                            TransactionStatus doTransaction(InitiateTransaction req, int UserID, int LapuID,int  TID, int SleepTime)
+                            TransactionStatus doTransaction(InitiateTransaction req, int UserID, int LapuID, int TID, int SleepTime)
                             {
                                 TransactionStatus tstatus = new TransactionStatus();
 
@@ -330,7 +330,7 @@ namespace Roundpay_Robo.AppCode
                                     item.LapuBalance = string.IsNullOrEmpty(tstatus.Balance) ? 0 : Convert.ToDecimal(tstatus.Balance);
                                     item.ErrorCode = tstatus.ErrorCode;
                                     item.Message = tstatus.ErrorMsg;
-                                    Cres = await UpdateTransaction(item);
+                                    var updateres = await UpdateTransaction(item);
                                     response.ERRORCODE = tstatus.ErrorCode;
                                     response.MSG = tstatus.ErrorMsg;
                                     return response;
@@ -357,7 +357,7 @@ namespace Roundpay_Robo.AppCode
                 };
                 var _ = new ProcPageErrorLog(_dal).Call(errorLog);
             }
-            
+
 
 
             return response;
@@ -369,10 +369,10 @@ namespace Roundpay_Robo.AppCode
             public int TID { get; set; }
             public int ProcessTime { get; set; }
             public DateTime StartDate { get; set; }
-            public DateTime  EndDate { get; set; }
+            public DateTime EndDate { get; set; }
         }
 
-        public static bool CheckTimeSesion(int TID, int  ProcessTime, DateTime StartDate, DateTime EndDate)
+        public static bool CheckTimeSesion(int TID, int ProcessTime, DateTime StartDate, DateTime EndDate)
         {
             try
             {
@@ -405,8 +405,9 @@ namespace Roundpay_Robo.AppCode
 
 
 
-        public async Task<Response> UpdateTransaction(LapuTransaction ltr)
+        public async Task<LapuProcUpdateTranResposne> UpdateTransaction(LapuTransaction ltr,bool IsCallback=false)
         {
+            ILapuApiML apiml = new LapuApiML(_accessor, _env, _dapper);
             var dbparams2 = new DynamicParameters();
             dbparams2.Add("UserID", ltr.UserID, DbType.Int32);
             dbparams2.Add("ID", ltr.TID, DbType.Int32);
@@ -416,7 +417,21 @@ namespace Roundpay_Robo.AppCode
             dbparams2.Add("LapuID", ltr.LapuID, DbType.Int32);
             dbparams2.Add("ErroCode", ltr.ErrorCode, DbType.String);
             dbparams2.Add("ErrorMessage", ltr.Message, DbType.String);
-            var ress = await Task.FromResult(_dapper.Update<Response>("proc_UpdateRechargeTransaction", dbparams2, commandType: CommandType.StoredProcedure));
+            dbparams2.Add("IsCallback", IsCallback, DbType.Boolean);
+            var ress = await Task.FromResult(_dapper.Update<LapuProcUpdateTranResposne>("proc_UpdateRechargeTransaction", dbparams2, commandType: CommandType.StoredProcedure));
+            if (ress.IsCallbackFound == true)
+            {
+                if (!string.IsNullOrEmpty(ress.CallbackURL))
+                {
+                    var apiurlhitting = new APIURLHitting()
+                    {
+                        UserID= ress.UserID,
+                        TransactionID= ress.TransactionID,
+                        URL= ress.CallbackURL
+                    };
+                    apiml.CallBackURLAfterManualRechUpdate(apiurlhitting);
+                }
+            }
             return ress;
         }
 
@@ -484,7 +499,7 @@ namespace Roundpay_Robo.AppCode
                 var dbparams = new DynamicParameters();
                 dbparams.Add("Type", Filter.Type, DbType.Int32);
                 dbparams.Add("Top", Filter.Top, DbType.Int32);
-                dbparams.Add("AccountNo", string.IsNullOrEmpty(Filter.AccountNo) ? "": Filter.AccountNo, DbType.String);
+                dbparams.Add("AccountNo", string.IsNullOrEmpty(Filter.AccountNo) ? "" : Filter.AccountNo, DbType.String);
                 dbparams.Add("TransactionID", Filter.TransactionID ?? "", DbType.String);
                 dbparams.Add("LapuNo", string.IsNullOrEmpty(Filter.LapuNo) ? "" : Filter.LapuNo, DbType.String);
                 dbparams.Add("LiveID", Filter.LiveID ?? "", DbType.String);

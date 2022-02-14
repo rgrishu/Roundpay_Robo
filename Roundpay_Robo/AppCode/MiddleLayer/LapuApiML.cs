@@ -66,13 +66,13 @@ namespace Roundpay_Robo.AppCode
             }
             return setting;
         }
-        public async Task<Response> LapuApiLogin(LapuLoginRequest lapuloginreq,int UserID, int LapuID,bool FromBalance=false)
+        public async Task<Response> LapuApiLogin(LapuLoginRequest lapuloginreq, int UserID, int LapuID, bool FromBalance = false)
         {
             var response = new Response()
             {
                 StatusCode = ErrorCodes.Minus1,
                 Msg = ErrorCodes.FAILED
-               
+
             };
             try
             {
@@ -105,7 +105,7 @@ namespace Roundpay_Robo.AppCode
                         res = JsonConvert.DeserializeObject<LapuLoginResponse>(resp);
                         if (res.Resp_code == LapuResCode.VRF)
                         {
-                          //  Two Is User For OTP 
+                            //  Two Is User For OTP 
                             response.StatusCode = ErrorCodes.Two;
                             response.Msg = "Otp Required";
                             return response;
@@ -121,7 +121,8 @@ namespace Roundpay_Robo.AppCode
                                 dbparams.Add("Balance", res.data.currentBal, DbType.Decimal);
                                 dbparams.Add("ProviderTokenID", res.data.token, DbType.String);
                                 response = await Task.FromResult(_dapper.Update<Response>("proc_UpdateLapuListBalance", dbparams, commandType: CommandType.StoredProcedure));
-                                if (!FromBalance) {
+                                if (!FromBalance)
+                                {
                                     response.Msg = response.StatusCode == 1 ? "Login Successfull" : response.Msg;
                                 }
                                 response.CommonStr = res.data.token;
@@ -151,7 +152,7 @@ namespace Roundpay_Robo.AppCode
             };
             if (string.IsNullOrEmpty(lapuloginreq.access_token))
             {
-                response = await LapuApiLogin(lapuloginreq, _lr.UserID, LapuID,true);
+                response = await LapuApiLogin(lapuloginreq, _lr.UserID, LapuID, true);
                 return response;
             }
 
@@ -210,7 +211,7 @@ namespace Roundpay_Robo.AppCode
             return response;
         }
 
-        public async Task<LapuApiTransactionRecord> LapuTransactioDataFromApi(LapuApiTransacrionReq lapuapitransacrionreq,int UserID,int LapuID)
+        public async Task<LapuApiTransactionRecord> LapuTransactioDataFromApi(LapuApiTransacrionReq lapuapitransacrionreq, int UserID, int LapuID)
         {
             LapuApiTransactionRecord response = new LapuApiTransactionRecord();
             try
@@ -275,7 +276,7 @@ namespace Roundpay_Robo.AppCode
                 var lappuerror = JsonConvert.DeserializeObject<LapuError>(otpres);
                 if (lappuerror.Resp_code == LapuResCode.ERR)
                 {
-                 ///   response = await LapuApiLogin(lapuloginreq, _lr, LapuID, true);
+                    ///   response = await LapuApiLogin(lapuloginreq, _lr, LapuID, true);
                     return response;
                 }
                 else
@@ -304,7 +305,7 @@ namespace Roundpay_Robo.AppCode
                     }
                     else
                     {
-                       // response = await LapuApiLogin(lapuloginreq, _lr, LapuID, true);
+                        // response = await LapuApiLogin(lapuloginreq, _lr, LapuID, true);
                         return response;
                     }
                 }
@@ -314,7 +315,7 @@ namespace Roundpay_Robo.AppCode
 
 
 
-        public async Task<string> InitiateTransaction(InitiateTransaction initiatetransaction, int UserID, int LapuID,int TID,int SleepTime)
+        public async Task<string> InitiateTransaction(InitiateTransaction initiatetransaction, int UserID, int LapuID, int TID, int SleepTime)
         {
             var recres = string.Empty;
             try
@@ -332,9 +333,9 @@ namespace Roundpay_Robo.AppCode
                 dbparams.Add("Response", recres, DbType.String);
                 dbparams.Add("ClassName", "InitiateTransaction", DbType.String);
                 dbparams.Add("Method", "Post", DbType.String);
-               _dapper.Insert<Response>("proc_SaveLapuReqRes", dbparams, commandType: CommandType.StoredProcedure);
+                _dapper.Insert<Response>("proc_SaveLapuReqRes", dbparams, commandType: CommandType.StoredProcedure);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ErrorLog errorLog = new ErrorLog
                 {
@@ -373,10 +374,41 @@ namespace Roundpay_Robo.AppCode
                     FuncName = "SaveLapuReqRes",
                     Error = ex.Message,
                     LoginTypeID = 1,
-                    UserId = larr!=null?larr.UserID:0,
+                    UserId = larr != null ? larr.UserID : 0,
                 };
                 var _ = new ProcPageErrorLog(_dal).Call(errorLog);
             }
+        }
+
+
+
+        public async Task<Response> CallBackURLAfterManualRechUpdate(APIURLHitting auh)
+        {
+            Response response = new Response();
+            try
+            {
+                var tranres = await AppWebRequest.O.CallUsingWebClient_GETAsync(auh.URL).ConfigureAwait(false);
+                
+                var dbparams = new DynamicParameters();
+                dbparams.Add("UserID", auh.UserID, DbType.Int32);
+                dbparams.Add("TransactionID", auh.TransactionID, DbType.String);
+                dbparams.Add("URL", auh.URL, DbType.String);
+                dbparams.Add("Response",tranres, DbType.String);
+                await Task.FromResult(_dapper.Insert<Response>("proc_Update_APIURLHitting", dbparams, commandType: CommandType.StoredProcedure));
+            }
+            catch (Exception ex)
+            {
+                ErrorLog errorLog = new ErrorLog
+                {
+                    ClassName = "LapuAPIML.cs",
+                    FuncName = "CallBackURLAfterManualRechUpdate",
+                    Error = ex.Message,
+                    LoginTypeID = 1,
+                    UserId = 0
+                };
+                var _ = new ProcPageErrorLog(_dal).Call(errorLog);
+            }
+            return response;
         }
 
     }

@@ -118,12 +118,22 @@
         public Data data { get; set; }
     }
 
+    
+
     public class TxnRecords
     {
         public List<TxnRecord> txnRecord { get; set; }
     }
 
-
+    public class APIURLHitting
+    {
+        public int ID { get; set; }
+        public int UserID { get; set; }
+        public string TransactionID { get; set; }
+        public string URL { get; set; }
+        public string Response { get; set; }
+        public string EntryDate { get; set; }
+    }
 
 
     public class LapuLoginResponse
@@ -253,6 +263,18 @@
         public string startDate { get; set; }
         public string txnType { get; set; }
         public string txnStatus { get; set; }
+    }
+
+
+    public class LapuProcUpdateTranResposne
+    {
+        public int StatusCode { get; set; }
+        public string Msg { get; set; }
+        public string TransactionID { get; set; }
+        public int TID { get; set; }
+        public int UserID { get; set; }
+        public bool IsCallbackFound { get; set; }
+        public string CallbackURL { get; set; }
     }
 
 }

@@ -75,7 +75,7 @@ namespace Roundpay_Robo.Controllers
             }
             ILapuML _lml = new LapuML(_accessor, _env, _dapper);
             ltr.UserID = _lr.UserID;
-            var res = _lml.UpdateTransaction(ltr).Result;
+            var res = _lml.UpdateTransaction(ltr,true).Result;
             return Json(res);
         }
         

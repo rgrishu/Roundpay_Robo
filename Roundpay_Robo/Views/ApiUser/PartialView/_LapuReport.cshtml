@@ -38,8 +38,8 @@
                 @if (@item.Type == 1)
                 {
                     <textarea class="cus-textarea"></textarea>
-                    <a class="cus-btn btn btn-sm btn-success text-light" onclick="Success(this)">Success</a>
-                    <a class="cus-btn btn btn-sm btn-danger text-light" onclick="Fail(this)">Failed</a>
+                    <a class="cus-btn btn btn-sm btn-success text-light" data-id="2" onclick="SuccessFail(this)">Success</a>
+                    <a class="cus-btn btn btn-sm btn-danger text-light" data-id="3" onclick="SuccessFail(this)">Failed</a>
                 }
             </td>
             @*<td class="text-nowrap"> <a class="btn btn-sm btn-danger text-light" onclick="btnDelete()"><i class="fas fa-trash"></i></a>
@@ -98,13 +98,13 @@ else
         });
     }
 
-    function Success(__this){
-        debugger;
+    function SuccessFail(__this){
+        
         preloader.load();
         var a = $(__this).closest('tr')
         var ltr = {
             TID : a.data().tId,
-            Type : 2,
+            Type : a.attr("data-id"),
             LiveID : $(".cus-textarea").val(),
             LapuCurrentAmt : 0,
             LapuID : a.data().lapuId
@@ -122,29 +122,29 @@ else
             an.alert(an.type.failed);
         })
     }
-     function Fail(__this){
-        debugger;
-        preloader.load();
-        var a = $(__this).closest('tr')
-        var ltr = {
-            TID : a.data().tId,
-            Type : 3,
-            LiveID : $(".cus-textarea").val(),
-            LapuCurrentAmt : 0,
-            LapuID : a.data().lapuId
-        }
-        $.post("UpdateTransactionStatus", ltr).done(function(result){
-            filterLapuReport();
-            preloader.remove();            
-            an.title = "Done!";
-            an.content = "Transaction Marked Failed";
-            an.alert(an.type.success);
-        }).fail(function(xhr){
-            preloader.remove();
-            an.title = "Oops!";
-            an.content = "Server Error";
-            an.alert(an.type.failed);
-        })
-    }
+    // function Fail(__this){
+    //    debugger;
+    //    preloader.load();
+    //    var a = $(__this).closest('tr')
+    //    var ltr = {
+    //        TID : a.data().tId,
+    //        Type : 3,
+    //        LiveID : $(".cus-textarea").val(),
+    //        LapuCurrentAmt : 0,
+    //        LapuID : a.data().lapuId
+    //    }
+    //    $.post("UpdateTransactionStatus", ltr).done(function(result){
+    //        filterLapuReport();
+    //        preloader.remove();            
+    //        an.title = "Done!";
+    //        an.content = "Transaction Marked Failed";
+    //        an.alert(an.type.success);
+    //    }).fail(function(xhr){
+    //        preloader.remove();
+    //        an.title = "Oops!";
+    //        an.content = "Server Error";
+    //        an.alert(an.type.failed);
+    //    })
+    //}
 
 </script>
