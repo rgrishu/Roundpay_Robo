@@ -220,7 +220,7 @@
         public string EntryDate { get; set; }
         public string ModifyDate { get; set; }
         public string LapuOpening { get; set; }
-        public decimal RechargeAmount { get; set; }
+        public int RechargeAmount { get; set; }
         public string LapuClosing { get; set; }
         public string LapuNo { get; set; }
         public string LiveID { get; set; }        
@@ -228,6 +228,7 @@
         public int TID { get; set; }
         public string TransactionStatus { get; set; }
         public string ProviderTokenID { get; set; }
+        public string TransactionDate { get; set; }
     }
     public class LapuServices : Lapu
     {

@@ -38,7 +38,17 @@ namespace Roundpay_Robo.Controllers
                 await SaveReqResp(req.UserID, resp).ConfigureAwait(false);
             return Json(res);
         }
-       
+
+        [HttpGet]
+        [Route("api/GetLapuTranData")]
+        public async Task<IActionResult> LapuTransactions(string Account="")
+        {
+            ILapuML ml = new LapuML(_accessor, _env, _dapper);
+            var res = ml.LapuTransactions().Result;
+            string resp = JsonConvert.SerializeObject(res);
+           // await SaveReqResp(req.UserID, resp).ConfigureAwait(false);
+            return Json(res);
+        }
         private async Task SaveReqResp(int UserID, string resp)
         {
             string req = "";

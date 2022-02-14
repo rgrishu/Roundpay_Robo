@@ -12,6 +12,7 @@ using Roundpay_Robo.Models;
 using Roundpay_Robo.Services;
 using RoundpayFinTech.AppCode.Model.ProcModel;
 using System.Data;
+using System.Globalization;
 using Validators;
 
 namespace Roundpay_Robo.AppCode
@@ -37,13 +38,13 @@ namespace Roundpay_Robo.AppCode
             _dal = new DAL(_c.GetConnectionString());
             _info = new RequestInfo(_accessor, _env);
         }
-        public async Task<Response> SaveVendor(VendorMaster vendormaster, LoginResponse _lr)
+        public async Task<CommonResponse> SaveVendor(VendorMaster vendormaster, LoginResponse _lr)
         {
             var dbparams = new DynamicParameters();
             dbparams.Add("LoginID", _lr.UserID, DbType.String);
             dbparams.Add("Name", vendormaster.VendorName, DbType.String);
             dbparams.Add("VendorID", vendormaster.ID, DbType.String);
-            var res = await Task.FromResult(_dapper.Insert<Response>("proc_SaveVendorMaster", dbparams, commandType: CommandType.StoredProcedure));
+            var res = await Task.FromResult(_dapper.Insert<CommonResponse>("proc_SaveVendorMaster", dbparams, commandType: CommandType.StoredProcedure));
             return res;
         }
         public async Task<List<VendorMaster>> GetVendorList(LoginResponse _lr)
@@ -62,19 +63,19 @@ namespace Roundpay_Robo.AppCode
             var res = await Task.FromResult(_dapper.GetAll<Lapu>("proc_GetLapuList", dbparams, commandType: CommandType.StoredProcedure));
             return res;
         }
-        public async Task<Response> LapuLogin(LapuLoginRequest lapulogireq, LoginResponse _lr, int LapuID)
+        public async Task<CommonResponse> LapuLogin(LapuLoginRequest lapulogireq, LoginResponse _lr, int LapuID)
         {
             ILapuApiML apiml = new LapuApiML(_accessor, _env, _dapper);
             var res = await apiml.LapuApiLogin(lapulogireq, _lr.UserID, LapuID);
             return res;
         }
-        public async Task<Response> LapuBalance(LapuLoginRequest lapulogireq, LoginResponse _lr, int LapuID)
+        public async Task<CommonResponse> LapuBalance(LapuLoginRequest lapulogireq, LoginResponse _lr, int LapuID)
         {
             ILapuApiML apiml = new LapuApiML(_accessor, _env, _dapper);
             var res = await apiml.LapuApiBalance(lapulogireq, _lr, LapuID);
             return res;
         }
-        public async Task<Response> ValidateOtp(ValidateLapuLoginOTP lapuotp, LoginResponse _lr, int LapuID)
+        public async Task<CommonResponse> ValidateOtp(ValidateLapuLoginOTP lapuotp, LoginResponse _lr, int LapuID)
         {
             ILapuApiML apiml = new LapuApiML(_accessor, _env, _dapper);
             var res = await apiml.LapuLoginOtpValidate(lapuotp, _lr, LapuID);
@@ -83,15 +84,106 @@ namespace Roundpay_Robo.AppCode
         public async Task<LapuApiTransactionRecord> LapuTransactioDataFromAPi(LapuApiTransacrionReq lapuapitransacrionreq, int UserID, int LapuID)
         {
             ILapuApiML apiml = new LapuApiML(_accessor, _env, _dapper);
-
+            var startdate = lapuapitransacrionreq.startDate.Trim().Substring(0, 11);
+            DateTime dt;
+            var dates = DateTime.TryParseExact(startdate, "dd MMM yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out dt);
+            lapuapitransacrionreq.minRecord = "0";
+            lapuapitransacrionreq.maxRecord = "50";
+            lapuapitransacrionreq.startDate = dt.ToString("dd-MMM-yy"); ;
+            lapuapitransacrionreq.endDate = dt.AddDays(1).ToString("dd-MMM-yy");
             var res = await apiml.LapuTransactioDataFromApi(lapuapitransacrionreq, UserID, LapuID);
             return res;
         }
+
+
+        //Get Lapu Api Transaction Data
+        public async Task<Response> LapuTransactions()
+        {
+            var res = new Response()
+            {
+                StatusCode = ErrorCodes.Minus1,
+                Msg = ErrorCodes.FAILED
+            };
+            try
+            {
+                ILapuApiML apiml = new LapuApiML(_accessor, _env, _dapper);
+                var dbparams = new DynamicParameters();
+                var pendtran = await Task.FromResult(_dapper.GetAll<LapuReport>("proc_SelectLapuPendingTransactions", dbparams, commandType: CommandType.StoredProcedure));
+                if (pendtran != null && pendtran.Count > 0)
+                {
+                    foreach (var item in pendtran)
+                    {
+                        DateTime dt;
+                        var startdate = item.EntryDate.Trim().Substring(0, 11);
+                        var dates = DateTime.TryParseExact(startdate, "dd MMM yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out dt);
+                        var lapuapitransacrionreq = new LapuApiTransacrionReq()
+                        {
+                            access_token = item.ProviderTokenID,
+                            minRecord = "0",
+                            maxRecord = "50",
+                            customerId = item.AccountNo,
+                            endDate = dt.AddDays(1).ToString("dd-MMM-yy"),
+                            startDate = dt.ToString("dd-MMM-yy")
+                        };
+                        var laputranres = await apiml.LapuTransactioDataFromApi(lapuapitransacrionreq, 0, 0);
+                        if (laputranres != null && laputranres.data != null)
+                        {
+                            if (laputranres.data.errorCode == LapuFailCode.SessionExpired)
+                            {
+                                res.Msg = laputranres.data.messageText;
+                                return res;
+                            }
+                            if (laputranres.data.txnRecords != null && laputranres.data.txnRecords.txnRecord.Count() == 1)
+                            {
+                                foreach (var lapurec in laputranres.data.txnRecords.txnRecord)
+                                {
+                                    string accno = "91" + item.AccountNo, RechargeAmount = item.RechargeAmount.ToString();
+
+                                    if (lapurec.customerId.Trim() == accno && lapurec.txnAmount.Trim() == RechargeAmount)
+                                    {
+                                        var ltr = new LapuTransaction()
+                                        {
+                                            UserID = 1,
+                                            TID = item.TID,
+                                            Type = lapurec.batchState == "SUCCESS" ? RechargeRespType.SUCCESS : RechargeRespType.FAILED,
+                                            LiveID = lapurec.voltTxnId,
+                                            LapuBalance = 0,
+                                            LapuID = item.LapuID,
+                                            ErrorCode = "",
+                                            Message = ""
+                                        };
+                                        var updateres = UpdateTransaction(ltr, true,true).Result;
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                }
+                res.StatusCode = ErrorCodes.One;
+                res.Msg = ErrorCodes.SUCCESS;
+            }
+            catch(Exception ex)
+            {
+                ErrorLog errorLog = new ErrorLog
+                {
+                    ClassName = "LapuML.cs",
+                    FuncName = "LapuTransactions",
+                    Error = ex.Message,
+                    LoginTypeID = 1,
+                    UserId = 0
+                };
+                var _ = new ProcPageErrorLog(_dal).Call(errorLog);
+            }
+        
+            return res;
+        }
+
         //for Api Use
         public async Task<LapuRechargeResponse> LappuApiRecharge(LapuRechargeRequest lapurecreq)
         {
             ILapuApiML apiml = new LapuApiML(_accessor, _env, _dapper);
-            var Cres = new Response()
+            var Cres = new CommonResponse()
             {
                 StatusCode = ErrorCodes.Minus1,
                 Msg = ErrorCodes.FAILED
@@ -293,7 +385,7 @@ namespace Roundpay_Robo.AppCode
                                             mobile = item.LapuNo,
                                             password = item.Password
                                         };
-                                        Response loginRes = _apiml.LapuApiLogin(lapuloginreq, item.UserID, item.LapuID).Result;
+                                        CommonResponse loginRes = _apiml.LapuApiLogin(lapuloginreq, item.UserID, item.LapuID).Result;
                                         if (loginRes != null)
                                         {
                                             if (loginRes.StatusCode == ErrorCodes.One)
@@ -405,7 +497,7 @@ namespace Roundpay_Robo.AppCode
 
 
 
-        public async Task<LapuProcUpdateTranResposne> UpdateTransaction(LapuTransaction ltr,bool IsCallback=false)
+        public async Task<LapuProcUpdateTranResposne> UpdateTransaction(LapuTransaction ltr, bool IsCallback = false,bool IsFromApi=false)
         {
             ILapuApiML apiml = new LapuApiML(_accessor, _env, _dapper);
             var dbparams2 = new DynamicParameters();
@@ -418,6 +510,7 @@ namespace Roundpay_Robo.AppCode
             dbparams2.Add("ErroCode", ltr.ErrorCode, DbType.String);
             dbparams2.Add("ErrorMessage", ltr.Message, DbType.String);
             dbparams2.Add("IsCallback", IsCallback, DbType.Boolean);
+            dbparams2.Add("IsFromApi", IsFromApi, DbType.Boolean);
             var ress = await Task.FromResult(_dapper.Update<LapuProcUpdateTranResposne>("proc_UpdateRechargeTransaction", dbparams2, commandType: CommandType.StoredProcedure));
             if (ress.IsCallbackFound == true)
             {
@@ -425,9 +518,9 @@ namespace Roundpay_Robo.AppCode
                 {
                     var apiurlhitting = new APIURLHitting()
                     {
-                        UserID= ress.UserID,
-                        TransactionID= ress.TransactionID,
-                        URL= ress.CallbackURL
+                        UserID = ress.UserID,
+                        TransactionID = ress.TransactionID,
+                        URL = ress.CallbackURL
                     };
                     apiml.CallBackURLAfterManualRechUpdate(apiurlhitting);
                 }
@@ -435,10 +528,10 @@ namespace Roundpay_Robo.AppCode
             return ress;
         }
 
-        public async Task<Response> SaveLapu(Lapu LapuUserDetail, LoginResponse _lr)
+        public async Task<CommonResponse> SaveLapu(Lapu LapuUserDetail, LoginResponse _lr)
         {
             var dbparams = new DynamicParameters();
-            Response res = new Response();
+            CommonResponse res = new CommonResponse();
             try
             {
                 dbparams.Add("LoginID", _lr.UserID, DbType.String);
@@ -452,7 +545,7 @@ namespace Roundpay_Robo.AppCode
                 dbparams.Add("Password", LapuUserDetail.Password, DbType.String);
                 dbparams.Add("LapuPin", LapuUserDetail.Pin, DbType.String);
                 dbparams.Add("OtherVendorName", LapuUserDetail.OtherVendorName, DbType.String);
-                res = await Task.FromResult(_dapper.Insert<Response>("proc_AddLapuDetial", dbparams, commandType: CommandType.StoredProcedure));
+                res = await Task.FromResult(_dapper.Insert<CommonResponse>("proc_AddLapuDetial", dbparams, commandType: CommandType.StoredProcedure));
 
             }
             catch (Exception ex)
@@ -468,12 +561,12 @@ namespace Roundpay_Robo.AppCode
             }
             return res;
         }
-        public async Task<Response> DeleteLapu(int LapuID, LoginResponse _lr)
+        public async Task<CommonResponse> DeleteLapu(int LapuID, LoginResponse _lr)
         {
             var dbparams = new DynamicParameters();
             dbparams.Add("LoginID", _lr.UserID, DbType.String);
             dbparams.Add("LapuID", LapuID, DbType.String);
-            var res = await Task.FromResult(_dapper.Insert<Response>("proc_DeleteLapuDetial", dbparams, commandType: CommandType.StoredProcedure));
+            var res = await Task.FromResult(_dapper.Insert<CommonResponse>("proc_DeleteLapuDetial", dbparams, commandType: CommandType.StoredProcedure));
             return res;
         }
         public async Task<Lapu> GetEditLapulist(int LapuID, LoginResponse _lr)
@@ -483,12 +576,12 @@ namespace Roundpay_Robo.AppCode
             var res = await Task.FromResult(_dapper.Insert<Lapu>("proc_GetLapuList", dbparams, commandType: CommandType.StoredProcedure));
             return res;
         }
-        public async Task<Response> UpdateLapuStatus(int LapuID, LoginResponse _lr)
+        public async Task<CommonResponse> UpdateLapuStatus(int LapuID, LoginResponse _lr)
         {
             var dbparams = new DynamicParameters();
             dbparams.Add("LoginID", _lr.UserID, DbType.String);
             dbparams.Add("LapuID", LapuID, DbType.String);
-            var res = await Task.FromResult(_dapper.Insert<Response>("Proc_Update_lapuStatus", dbparams, commandType: CommandType.StoredProcedure));
+            var res = await Task.FromResult(_dapper.Insert<CommonResponse>("Proc_Update_lapuStatus", dbparams, commandType: CommandType.StoredProcedure));
             return res;
         }
         public async Task<List<LapuReport>> GetLapuReport(LapuReport Filter, LoginResponse _lr)
@@ -509,12 +602,12 @@ namespace Roundpay_Robo.AppCode
             catch { }
             return res;
         }
-        public async Task<Response> DeleteLapuVendor(int ID, LoginResponse _lr)
+        public async Task<CommonResponse> DeleteLapuVendor(int ID, LoginResponse _lr)
         {
             var dbparams = new DynamicParameters();
             dbparams.Add("LoginID", _lr.UserID, DbType.String);
             dbparams.Add("VendorID", ID, DbType.String);
-            var res = await Task.FromResult(_dapper.Insert<Response>("proc_DeletelapuVendor", dbparams, commandType: CommandType.StoredProcedure));
+            var res = await Task.FromResult(_dapper.Insert<CommonResponse>("proc_DeletelapuVendor", dbparams, commandType: CommandType.StoredProcedure));
             return res;
         }
         public async Task<VendorMaster> SelectEditVendor(int ID, LoginResponse _lr)

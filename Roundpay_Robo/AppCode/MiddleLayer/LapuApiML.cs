@@ -66,9 +66,9 @@ namespace Roundpay_Robo.AppCode
             }
             return setting;
         }
-        public async Task<Response> LapuApiLogin(LapuLoginRequest lapuloginreq, int UserID, int LapuID, bool FromBalance = false)
+        public async Task<CommonResponse> LapuApiLogin(LapuLoginRequest lapuloginreq, int UserID, int LapuID, bool FromBalance = false)
         {
-            var response = new Response()
+            var response = new CommonResponse()
             {
                 StatusCode = ErrorCodes.Minus1,
                 Msg = ErrorCodes.FAILED
@@ -120,7 +120,7 @@ namespace Roundpay_Robo.AppCode
                                 dbparams.Add("LapuID", LapuID, DbType.Int32);
                                 dbparams.Add("Balance", res.data.currentBal, DbType.Decimal);
                                 dbparams.Add("ProviderTokenID", res.data.token, DbType.String);
-                                response = await Task.FromResult(_dapper.Update<Response>("proc_UpdateLapuListBalance", dbparams, commandType: CommandType.StoredProcedure));
+                                response = await Task.FromResult(_dapper.Update<CommonResponse>("proc_UpdateLapuListBalance", dbparams, commandType: CommandType.StoredProcedure));
                                 if (!FromBalance)
                                 {
                                     response.Msg = response.StatusCode == 1 ? "Login Successfull" : response.Msg;
@@ -143,9 +143,9 @@ namespace Roundpay_Robo.AppCode
             }
             return response;
         }
-        public async Task<Response> LapuApiBalance(LapuLoginRequest lapuloginreq, LoginResponse _lr, int LapuID)
+        public async Task<CommonResponse> LapuApiBalance(LapuLoginRequest lapuloginreq, LoginResponse _lr, int LapuID)
         {
-            var response = new Response()
+            var response = new CommonResponse()
             {
                 StatusCode = ErrorCodes.Minus1,
                 Msg = ErrorCodes.FAILED
@@ -189,7 +189,7 @@ namespace Roundpay_Robo.AppCode
                             dbparams.Add("LapuID", LapuID, DbType.Int32);
                             dbparams.Add("Balance", profileres.data.currentBal, DbType.Decimal);
                             dbparams.Add("ProviderTokenID", lapuloginreq.access_token, DbType.String);
-                            response = await Task.FromResult(_dapper.Update<Response>("proc_UpdateLapuListBalance", dbparams, commandType: CommandType.StoredProcedure));
+                            response = await Task.FromResult(_dapper.Update<CommonResponse>("proc_UpdateLapuListBalance", dbparams, commandType: CommandType.StoredProcedure));
                         }
                         else
                         {
@@ -250,9 +250,9 @@ namespace Roundpay_Robo.AppCode
             return response;
         }
 
-        public async Task<Response> LapuLoginOtpValidate(ValidateLapuLoginOTP lapuloginotpval, LoginResponse _lr, int LapuID)
+        public async Task<CommonResponse> LapuLoginOtpValidate(ValidateLapuLoginOTP lapuloginotpval, LoginResponse _lr, int LapuID)
         {
-            var response = new Response()
+            var response = new CommonResponse()
             {
                 StatusCode = ErrorCodes.Minus1,
                 Msg = ErrorCodes.FAILED
@@ -291,7 +291,7 @@ namespace Roundpay_Robo.AppCode
                             dbparams.Add("LapuID", LapuID, DbType.Int32);
                             dbparams.Add("Balance", otpobjres.data.currentBal, DbType.Decimal);
                             dbparams.Add("ProviderTokenID", "", DbType.String);
-                            response = await Task.FromResult(_dapper.Update<Response>("proc_UpdateLapuListBalance", dbparams, commandType: CommandType.StoredProcedure));
+                            response = await Task.FromResult(_dapper.Update<CommonResponse>("proc_UpdateLapuListBalance", dbparams, commandType: CommandType.StoredProcedure));
                         }
                         else
                         {
@@ -364,7 +364,7 @@ namespace Roundpay_Robo.AppCode
                 dbparams.Add("Response", larr.Response, DbType.String);
                 dbparams.Add("ClassName", larr.ClassName, DbType.String);
                 dbparams.Add("Method", larr.Method, DbType.String);
-                await Task.FromResult(_dapper.Insert<Response>("proc_SaveLapuReqRes", dbparams, commandType: CommandType.StoredProcedure));
+                await Task.FromResult(_dapper.Insert<CommonResponse>("proc_SaveLapuReqRes", dbparams, commandType: CommandType.StoredProcedure));
             }
             catch (Exception ex)
             {
@@ -382,9 +382,9 @@ namespace Roundpay_Robo.AppCode
 
 
 
-        public async Task<Response> CallBackURLAfterManualRechUpdate(APIURLHitting auh)
+        public async Task<CommonResponse> CallBackURLAfterManualRechUpdate(APIURLHitting auh)
         {
-            Response response = new Response();
+            CommonResponse response = new CommonResponse();
             try
             {
                 var tranres = await AppWebRequest.O.CallUsingWebClient_GETAsync(auh.URL).ConfigureAwait(false);
@@ -394,7 +394,7 @@ namespace Roundpay_Robo.AppCode
                 dbparams.Add("TransactionID", auh.TransactionID, DbType.String);
                 dbparams.Add("URL", auh.URL, DbType.String);
                 dbparams.Add("Response",tranres, DbType.String);
-                await Task.FromResult(_dapper.Insert<Response>("proc_Update_APIURLHitting", dbparams, commandType: CommandType.StoredProcedure));
+                await Task.FromResult(_dapper.Insert<CommonResponse>("proc_Update_APIURLHitting", dbparams, commandType: CommandType.StoredProcedure));
             }
             catch (Exception ex)
             {
