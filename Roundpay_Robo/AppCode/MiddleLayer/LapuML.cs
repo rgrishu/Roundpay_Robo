@@ -138,23 +138,32 @@ namespace Roundpay_Robo.AppCode
                                 foreach (var lapurec in laputranres.data.txnRecords.txnRecord)
                                 {
                                     string accno = "91" + item.AccountNo, RechargeAmount = item.RechargeAmount.ToString();
-
-                                    if (lapurec.customerId.Trim() == accno && lapurec.txnAmount.Trim() == RechargeAmount)
+                                    var type = RechargeRespType.PENDING; bool IsUpdate = false;
+                                    if (lapurec.batchState.Equals("SUCCESS", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        IsUpdate = true;
+                                        type = RechargeRespType.SUCCESS;
+                                    }
+                                    else if (lapurec.batchState.Equals("FAILED", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        IsUpdate = true;
+                                        type = RechargeRespType.FAILED;
+                                    }
+                                    if (lapurec.customerId.Trim() == accno && lapurec.txnAmount.Trim() == RechargeAmount && IsUpdate)
                                     {
                                         var ltr = new LapuTransaction()
                                         {
                                             UserID = 1,
                                             TID = item.TID,
-                                            Type = lapurec.batchState == "SUCCESS" ? RechargeRespType.SUCCESS : RechargeRespType.FAILED,
+                                            Type = type,
                                             LiveID = lapurec.voltTxnId,
                                             LapuBalance = 0,
                                             LapuID = item.LapuID,
                                             ErrorCode = "",
                                             Message = ""
                                         };
-                                        var updateres = UpdateTransaction(ltr, true,true).Result;
+                                        var updateres = UpdateTransaction(ltr, true, true).Result;
                                     }
-
                                 }
                             }
                         }
@@ -163,7 +172,7 @@ namespace Roundpay_Robo.AppCode
                 res.StatusCode = ErrorCodes.One;
                 res.Msg = ErrorCodes.SUCCESS;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ErrorLog errorLog = new ErrorLog
                 {
@@ -175,7 +184,7 @@ namespace Roundpay_Robo.AppCode
                 };
                 var _ = new ProcPageErrorLog(_dal).Call(errorLog);
             }
-        
+
             return res;
         }
 
@@ -497,7 +506,7 @@ namespace Roundpay_Robo.AppCode
 
 
 
-        public async Task<LapuProcUpdateTranResposne> UpdateTransaction(LapuTransaction ltr, bool IsCallback = false,bool IsFromApi=false)
+        public async Task<LapuProcUpdateTranResposne> UpdateTransaction(LapuTransaction ltr, bool IsCallback = false, bool IsFromApi = false)
         {
             ILapuApiML apiml = new LapuApiML(_accessor, _env, _dapper);
             var dbparams2 = new DynamicParameters();
